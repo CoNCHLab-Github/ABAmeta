@@ -16,7 +16,7 @@ WaitSecs(0.1);
 subjectID = input('Enter subject ID: ', 's');
 
 % Set parameters
-p.results_dir = fullfile('./results', exp.subjID);;
+p.results_dir = fullfile('./results', exp.subjID);
 p.text_size = 30;
 p.text_font = 'Arial';
 p.back_color = [127 127 127];
