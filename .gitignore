@@ -1,3 +1,5 @@
 .venv
 wxpython
 psychopy
+.DS_Store
+
