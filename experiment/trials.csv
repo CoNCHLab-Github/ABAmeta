@@ -1,0 +1,6 @@
+﻿level,df_st,A_freq_Hz,B_freq_Hz,stimuli
+1,0,400,400,../stimuli/ABA_level_1_df_0st_B_400.0Hz_A_400Hz.wav
+2,2,400,449,../stimuli/ABA_level_2_df_2st_B_449.0Hz_A_400Hz.wav
+3,4,400,504,../stimuli/ABA_level_3_df_4st_B_504.0Hz_A_400Hz.wav
+4,6,400,565.7,../stimuli/ABA_level_4_df_6st_B_565.7Hz_A_400Hz.wav
+5,8,400,635,../stimuli/ABA_level_5_df_8st_B_635.0Hz_A_400Hz.wav
