@@ -173,4 +173,6 @@ function [sequence, t] = make_sequence(type, freq, Fs, beep_len, envelope, trial
     end
     t_end = repetitions_num*4*beep_len;
     t = linspace(0, t_end, length(sequence));
+    AWeighting = weightingFilter('A-weighting',Fs);
+    sequence = AWeighting(sequence);
 end
