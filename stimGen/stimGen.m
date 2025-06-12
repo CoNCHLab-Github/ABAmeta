@@ -5,12 +5,12 @@ close all
 clear
 clc
 
-cd("C:\Users\bmesquit\OneDrive - The University of Western Ontario\Academia\Research\phD\ABAMeta\stimGen")
+cd("D:\Projects\ABAmeta\stimGen")
 addpath(genpath(pwd))
 
 %% Constant variables and parameters
 % Time and Frequency parameters
-Fs = 48000; % Hz - sampling rate (The Audio Dome's display sampling rate)
+Fs = 48000; % Hz - sampling rate (The PsychoPy compatible sampling rate)
 trial_len = 16; % s - trial duration
 beep_len = 0.125; % s - beep sound duration (equal for A and B sequences)
 init_silent_len = 0.125; % s - silent period length in the begining of the trial
@@ -27,12 +27,9 @@ df_max = 8; % semitones - delta f max
 df_min = 0; % semitones - delta f min
 
 % Jitter parameters
-jitter_steps = 1 % how many above and below the base frequency
-jitter_max = 4 % how many semitones above and below the base frequency
-jitter_min = -4 % how many semitones below the base frequency
-
-
-
+jitter_steps = 1; % jitter increments in semitones
+jitter_max = 4; % how many semitones above and below the base frequency
+jitter_min = -4; % how many semitones below the base frequency
 
 %% Amplitude Envelope
 close all
@@ -44,6 +41,16 @@ envelope = ones(1, length(t_temp));
 envelope(t_temp<(envelope_ramp_len*beep_len)) = sin(2*pi*t_temp(t_temp<(envelope_ramp_len*beep_len))/(4*envelope_ramp_len*beep_len)).^2;
 envelope(end-length(envelope(t_temp<(envelope_ramp_len*beep_len)))+1:end) = 1-envelope(t_temp<(envelope_ramp_len*beep_len));
 envelope = db2mag(amp)*envelope; 
+% visualization
+%{
+figure
+plot(t_temp, envelope, "Color", 'k', 'LineWidth', 1.5)
+xlim([t_temp(1), t_temp(end)])
+ylim([-0.1, db2mag(amp)+0.2])
+xlabel('T (s)')
+ylabel('Envelope')
+title(['Amplitude Envelope: ramp duration ratio = ', num2str(envelope_ramp_len)])
+%}
 
 %% A sequence
 close all
