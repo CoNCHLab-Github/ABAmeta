@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" ?>
-<PsychoPy2experiment encoding="utf-8" version="2024.2.4">
+<PsychoPy2experiment encoding="utf-8" version="2025.1.1">
   <Settings>
     <Param val="4" valType="str" updates="None" name="Audio latency priority"/>
     <Param val="ptb" valType="str" updates="None" name="Audio lib"/>
@@ -26,7 +26,7 @@
     <Param val="False" valType="bool" updates="None" name="Show mouse"/>
     <Param val="height" valType="str" updates="None" name="Units"/>
     <Param val="" valType="str" updates="None" name="Use version"/>
-    <Param val="[1920, 1080]" valType="list" updates="None" name="Window size (pixels)"/>
+    <Param val="[1440, 2560]" valType="list" updates="None" name="Window size (pixels)"/>
     <Param val="none" valType="str" updates="None" name="backgroundFit"/>
     <Param val="" valType="str" updates="None" name="backgroundImg"/>
     <Param val="avg" valType="str" updates="None" name="blendMode"/>
@@ -47,6 +47,7 @@
     <Param val="RIGHT_EYE" valType="str" updates="None" name="elTrackEyes"/>
     <Param val="PUPIL_CR_TRACKING" valType="str" updates="None" name="elTrackingMode"/>
     <Param val="staircasePsychopy" valType="str" updates="None" name="expName"/>
+    <Param val="" valType="str" updates="None" name="expVersion"/>
     <Param val="on Sync" valType="str" updates="None" name="exportHTML"/>
     <Param val="None" valType="str" updates="None" name="eyetracker"/>
     <Param val="" valType="code" updates="None" name="frameRate"/>
@@ -103,7 +104,7 @@
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="/* Syntax Error: Fix Python code */" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="startingIntensity = 4.00&amp;#10;stimDuration = 16&amp;#10;hitThreshold = 0.5&amp;#10;nRev = 6&amp;#10;nTrials = 10&amp;#10;stepSizes = [1.00,1.00,0.50,0.50,0.25,0.25]&amp;#10;&amp;#10;staircase = data.StairHandler(startVal = startingIntensity, nTrials = nTrials, nReversals= nRev, stepType='lin', minVal = 0.00, maxVal= 8.00, nUp = 1, nDown = 1, stepSizes = stepSizes)&amp;#10;&amp;#10;stimFile = 'stimuli\ABA\df_' + &quot;{:.2f}&quot;.format(startingIntensity) + '_jitter_0.wav'&amp;#10;&amp;#10;def proportion_pressed(press_times, release_times, trial_duration=7.0):&amp;#10;    # Ensure lists are sorted&amp;#10;    press_times = sorted(press_times)&amp;#10;    release_times = sorted(release_times)&amp;#10;    &amp;#10;    intervals = []&amp;#10;    current_time = 0.0&amp;#10;    pressed = True  # Button starts pressed&amp;#10;&amp;#10;    # Merge events into a timeline&amp;#10;    events = []&amp;#10;    for t in press_times:&amp;#10;        events.append((t, 'press'))&amp;#10;    for t in release_times:&amp;#10;        events.append((t, 'release'))&amp;#10;    events.sort()&amp;#10;&amp;#10;    for t, event in events:&amp;#10;        if pressed:&amp;#10;            intervals.append((current_time, t))&amp;#10;        current_time = t&amp;#10;        pressed = (event == 'press')&amp;#10;&amp;#10;    # If still pressed at the end, add the last interval&amp;#10;    if pressed and current_time &lt; trial_duration:&amp;#10;        intervals.append((current_time, trial_duration))&amp;#10;&amp;#10;    # Sum all pressed intervals&amp;#10;    pressed_time = sum(end - start for start, end in intervals)&amp;#10;    return pressed_time / trial_duration" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="startingIntensity = 4.00&amp;#10;stimDuration = 16&amp;#10;hitThreshold = 0.5&amp;#10;nRev = 6&amp;#10;nTrials = 10&amp;#10;stepSizes = [1.00,1.00,0.50,0.50,0.25,0.25]&amp;#10;&amp;#10;staircase = data.StairHandler(startVal = startingIntensity, nTrials = nTrials, nReversals= nRev, stepType='lin', minVal = 0.00, maxVal= 8.00, nUp = 1, nDown = 1, stepSizes = stepSizes)&amp;#10;&amp;#10;stimFile = 'stimuli\ABA\df_' + &quot;{:.2f}&quot;.format(startingIntensity) + '_jitter_0.wav'&amp;#10;&amp;#10;def proportion_pressed(press_times, release_times, trial_duration=stimDuration):&amp;#10;    # Ensure lists are sorted&amp;#10;    press_times = sorted(press_times)&amp;#10;    release_times = sorted(release_times)&amp;#10;    &amp;#10;    intervals = []&amp;#10;    current_time = 0.0&amp;#10;    pressed = True  # Button starts pressed&amp;#10;&amp;#10;    # Merge events into a timeline&amp;#10;    events = []&amp;#10;    for t in press_times:&amp;#10;        events.append((t, 'press'))&amp;#10;    for t in release_times:&amp;#10;        events.append((t, 'release'))&amp;#10;    events.sort()&amp;#10;&amp;#10;    for t, event in events:&amp;#10;        if pressed:&amp;#10;            intervals.append((current_time, t))&amp;#10;        current_time = t&amp;#10;        pressed = (event == 'press')&amp;#10;&amp;#10;    # If still pressed at the end, add the last interval&amp;#10;    if pressed and current_time &lt; trial_duration:&amp;#10;        intervals.append((current_time, trial_duration))&amp;#10;&amp;#10;    # Sum all pressed intervals&amp;#10;    pressed_time = sum(end - start for start, end in intervals)&amp;#10;    return pressed_time / trial_duration" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Py" valType="str" updates="None" name="Code Type"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
@@ -248,8 +249,11 @@
         <Param val="" valType="str" updates="None" name="deviceLabel"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="False" valType="bool" updates="constant" name="forceEndRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="hamming"/>
+        <Param val="1" valType="code" updates="None" name="latencyClass"/>
         <Param val="trial_sound" valType="code" updates="None" name="name"/>
+        <Param val="True" valType="str" updates="None" name="resample"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
         <Param val="$stimFile" valType="str" updates="set every repeat" name="sound"/>
         <Param val="4.0" valType="code" updates="None" name="speakerIndex"/>
@@ -260,6 +264,7 @@
         <Param val="stimDuration" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="constant" name="stopWithRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="syncScreenRefresh"/>
+        <Param val="" valType="code" updates="None" name="validator"/>
         <Param val="0.2" valType="num" updates="constant" name="volume"/>
       </SoundComponent>
       <KeyboardComponent name="space_release" plugin="None">
@@ -370,8 +375,11 @@
         <Param val="" valType="str" updates="None" name="deviceLabel"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="False" valType="bool" updates="constant" name="forceEndRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="hamming"/>
+        <Param val="1" valType="code" updates="None" name="latencyClass"/>
         <Param val="washout" valType="code" updates="None" name="name"/>
+        <Param val="True" valType="str" updates="None" name="resample"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
         <Param val="stimuli/noise.wav" valType="str" updates="set every repeat" name="sound"/>
         <Param val="6.0" valType="code" updates="None" name="speakerIndex"/>
@@ -382,6 +390,7 @@
         <Param val="2" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="constant" name="stopWithRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="syncScreenRefresh"/>
+        <Param val="" valType="code" updates="None" name="validator"/>
         <Param val="0.1" valType="num" updates="constant" name="volume"/>
       </SoundComponent>
       <CodeComponent name="prepNextTrial_2" plugin="None">
@@ -396,8 +405,8 @@
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="End Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="End JS Experiment"/>
-        <Param val="/* Syntax Error: Fix Python code */" valType="extendedCode" updates="constant" name="End JS Routine"/>
-        <Param val="staircase.addResponse(resp)  # response = 0 (integrated) or 1 (segregated)&amp;#10;try:&amp;#10;    nextDF = staircase.next()&amp;#10;    feedback = &quot;Proportion of correct: &quot; + str(prop) + &quot;, Resp was therefore: &quot; + str(resp) + &quot;, Next df will be: &quot; + &quot;{:.2f}&quot;.format(nextDF) &amp;#10;    print(feedback)&amp;#10;    stimFile = 'stimuli\ABA\df_' + &quot;{:.2f}&quot;.format(nextDF) + '_jitter_0.wav'&amp;#10;    &amp;#10;except StopIteration:&amp;#10;    reversal_intensities = staircase.reversalIntensities&amp;#10;    jnd = sum(reversal_intensities) / len(reversal_intensities)&amp;#10;    trialLoop.finished = True" valType="extendedCode" updates="constant" name="End Routine"/>
+        <Param val="staircase.addResponse(resp);&amp;#10;try {&amp;#10;    nextDF = staircase.next();&amp;#10;    feedback = `Integrated percept time proportion: ${prop}, Resp was therefore: ${resp}, Next df will be: ${util.pad(Number.parseFloat(nextDF).toFixed(2), 1)}`;&amp;#10;    console.log(feedback);&amp;#10;    stimFile = `stimuli\ABA\df_${util.pad(Number.parseFloat(nextDF).toFixed(2), 1)}_jitter_0.wav`;&amp;#10;} catch(e) {&amp;#10;    if ((e instanceof StopIteration)) {&amp;#10;        reversal_intensities = staircase.reversalIntensities;&amp;#10;        jnd = (util.sum(reversal_intensities) / reversal_intensities.length);&amp;#10;        trialLoop.finished = true;&amp;#10;    } else {&amp;#10;        throw e;&amp;#10;    }&amp;#10;}&amp;#10;" valType="extendedCode" updates="constant" name="End JS Routine"/>
+        <Param val="staircase.addResponse(resp)  # response = 0 (integrated) or 1 (segregated)&amp;#10;try:&amp;#10;    nextDF = staircase.next()&amp;#10;    feedback = f&quot;Integrated percept time proportion: {prop}, Resp was therefore: {resp}, Next df will be: {nextDF:.2f}&quot;&amp;#10;    print(feedback)&amp;#10;    stimFile = f&quot;stimuli\ABA\df_{nextDF:.2f}_jitter_0.wav&quot;&amp;#10;except StopIteration:&amp;#10;    reversal_intensities = staircase.reversalIntensities&amp;#10;    jnd = sum(reversal_intensities) / len(reversal_intensities)&amp;#10;    trialLoop.finished = True" valType="extendedCode" updates="constant" name="End Routine"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="prepNextTrial_2" valType="code" updates="None" name="name"/>
       </CodeComponent>

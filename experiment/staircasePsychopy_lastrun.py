@@ -1,8 +1,8 @@
 ﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-This experiment was created using PsychoPy3 Experiment Builder (v2024.2.4),
-    on June 04, 2025, at 15:21
+This experiment was created using PsychoPy3 Experiment Builder (v2025.1.1),
+    on June 16, 2025, at 18:16
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -17,11 +17,12 @@ from psychopy import prefs
 from psychopy import plugins
 plugins.activatePlugins()
 prefs.hardware['audioLib'] = 'ptb'
-prefs.hardware['audioLatencyMode'] = '4'
 from psychopy import sound, gui, visual, core, data, event, logging, clock, colors, layout, hardware
 from psychopy.tools import environmenttools
-from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
-                                STOPPED, FINISHED, PRESSED, RELEASED, FOREVER, priority)
+from psychopy.constants import (
+    NOT_STARTED, STARTED, PLAYING, PAUSED, STOPPED, STOPPING, FINISHED, PRESSED, 
+    RELEASED, FOREVER, priority
+)
 
 import numpy as np  # whole numpy lib is available, prepend 'np.'
 from numpy import (sin, cos, tan, log, log10, pi, average,
@@ -39,14 +40,18 @@ deviceManager = hardware.DeviceManager()
 # ensure that relative paths start from the same directory as this script
 _thisDir = os.path.dirname(os.path.abspath(__file__))
 # store info about the experiment session
-psychopyVersion = '2024.2.4'
+psychopyVersion = '2025.1.1'
 expName = 'staircasePsychopy'  # from the Builder filename that created this script
+expVersion = ''
+# a list of functions to run when the experiment ends (starts off blank)
+runAtExit = []
 # information about this experiment
 expInfo = {
     'participant': f"{randint(0, 999999):06.0f}",
     'session': '001',
     'date|hid': data.getDateStr(),
     'expName|hid': expName,
+    'expVersion|hid': expVersion,
     'psychopyVersion|hid': psychopyVersion,
 }
 
@@ -60,7 +65,7 @@ or run the experiment with `--pilot` as an argument. To change what pilot
 PILOTING = core.setPilotModeFromArgs()
 # start off with values from experiment settings
 _fullScr = True
-_winSize = [1920, 1080]
+_winSize = [1440, 2560]
 # if in pilot mode, apply overrides according to preferences
 if PILOTING:
     # force windowed mode
@@ -68,6 +73,9 @@ if PILOTING:
         _fullScr = False
         # set window size
         _winSize = prefs.piloting['forcedWindowSize']
+    # replace default participant ID
+    if prefs.piloting['replaceParticipantID']:
+        expInfo['participant'] = 'pilot'
 
 def showExpInfoDlg(expInfo):
     """
@@ -124,9 +132,9 @@ def setupData(expInfo, dataDir=None):
     
     # an ExperimentHandler isn't essential but helps with data saving
     thisExp = data.ExperimentHandler(
-        name=expName, version='',
+        name=expName, version=expVersion,
         extraInfo=expInfo, runtimeInfo=None,
-        originPath='E:\\ABAMeta\\experiment\\staircasePsychopy_lastrun.py',
+        originPath='D:\\Projects\\ABAmeta\\experiment\\staircasePsychopy_lastrun.py',
         savePickle=True, saveWideText=True,
         dataFileName=dataDir + os.sep + filename, sortColumns='time'
     )
@@ -214,9 +222,13 @@ def setupWindow(expInfo=None, win=None):
             win._monitorFrameRate = win.getActualFrameRate(infoMsg='Attempting to measure frame rate of screen, please wait...')
         expInfo['frameRate'] = win._monitorFrameRate
     win.hideMessage()
-    # show a visual indicator if we're in piloting mode
-    if PILOTING and prefs.piloting['showPilotingIndicator']:
-        win.showPilotingIndicator()
+    if PILOTING:
+        # show a visual indicator if we're in piloting mode
+        if prefs.piloting['showPilotingIndicator']:
+            win.showPilotingIndicator()
+        # always show the mouse in piloting mode
+        if prefs.piloting['forceMouseVisible']:
+            win.mouseVisible = True
     
     return win
 
@@ -270,7 +282,9 @@ def setupDevices(expInfo, thisExp, win):
     deviceManager.addDevice(
         deviceName='trial_sound',
         deviceClass='psychopy.hardware.speaker.SpeakerDevice',
-        index=4.0
+        index=4.0,
+        resample='True',
+        latencyClass=1,
     )
     if deviceManager.getDevice('space_release') is None:
         # initialise space_release
@@ -284,10 +298,18 @@ def setupDevices(expInfo, thisExp, win):
             deviceClass='keyboard',
             deviceName='space_press',
         )
+    # create speaker 'washout'
+    deviceManager.addDevice(
+        deviceName='washout',
+        deviceClass='psychopy.hardware.speaker.SpeakerDevice',
+        index=6.0,
+        resample='True',
+        latencyClass=1,
+    )
     # return True if completed successfully
     return True
 
-def pauseExperiment(thisExp, win=None, timers=[], playbackComponents=[]):
+def pauseExperiment(thisExp, win=None, timers=[], currentRoutine=None):
     """
     Pause this experiment, preventing the flow from advancing to the next routine until resumed.
     
@@ -300,8 +322,8 @@ def pauseExperiment(thisExp, win=None, timers=[], playbackComponents=[]):
         Window for this experiment.
     timers : list, tuple
         List of timers to reset once pausing is finished.
-    playbackComponents : list, tuple
-        List of any components with a `pause` method which need to be paused.
+    currentRoutine : psychopy.data.Routine
+        Current Routine we are in at time of pausing, if any. This object tells PsychoPy what Components to pause/play/dispatch.
     """
     # if we are not paused, do nothing
     if thisExp.status != PAUSED:
@@ -310,8 +332,9 @@ def pauseExperiment(thisExp, win=None, timers=[], playbackComponents=[]):
     # start a timer to figure out how long we're paused for
     pauseTimer = core.Clock()
     # pause any playback components
-    for comp in playbackComponents:
-        comp.pause()
+    if currentRoutine is not None:
+        for comp in currentRoutine.getPlaybackComponents():
+            comp.pause()
     # make sure we have a keyboard
     defaultKeyboard = deviceManager.getDevice('defaultKeyboard')
     if defaultKeyboard is None:
@@ -325,14 +348,19 @@ def pauseExperiment(thisExp, win=None, timers=[], playbackComponents=[]):
         # check for quit (typically the Esc key)
         if defaultKeyboard.getKeys(keyList=['escape']):
             endExperiment(thisExp, win=win)
+        # dispatch messages on response components
+        if currentRoutine is not None:
+            for comp in currentRoutine.getDispatchComponents():
+                comp.device.dispatchMessages()
         # sleep 1ms so other threads can execute
         clock.time.sleep(0.001)
     # if stop was requested while paused, quit
     if thisExp.status == FINISHED:
         endExperiment(thisExp, win=win)
     # resume any playback components
-    for comp in playbackComponents:
-        comp.play()
+    if currentRoutine is not None:
+        for comp in currentRoutine.getPlaybackComponents():
+            comp.play()
     # reset any timers
     for timer in timers:
         timer.addTime(-pauseTimer.getTime())
@@ -424,6 +452,14 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         lineWidth=1.0,
         colorSpace='rgb', lineColor='white', fillColor=[1.0000, 1.0000, 0.8824],
         opacity=None, depth=0.0, interpolate=True)
+    washout = sound.Sound(
+        'A', 
+        secs=2, 
+        stereo=True, 
+        hamming=True, 
+        speaker='washout',    name='washout'
+    )
+    washout.setVolume(0.1)
     
     # --- Initialize components for Routine "logJND" ---
     
@@ -476,7 +512,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     stimFile = 'stimuli\ABA\df_' + "{:.2f}".format(startingIntensity) + '_jitter_0.wav'
     
-    def proportion_pressed(press_times, release_times, trial_duration=7.0):
+    def proportion_pressed(press_times, release_times, trial_duration=stimDuration):
         # Ensure lists are sorted
         press_times = sorted(press_times)
         release_times = sorted(release_times)
@@ -547,8 +583,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             pauseExperiment(
                 thisExp=thisExp, 
                 win=win, 
-                timers=[routineTimer], 
-                playbackComponents=[]
+                timers=[routineTimer, globalClock], 
+                currentRoutine=setup,
             )
             # skip the frame we paused on
             continue
@@ -600,6 +636,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         thisSession.sendExperimentData()
     
     for thisTrialLoop in trialLoop:
+        trialLoop.status = STARTED
+        if hasattr(thisTrialLoop, 'status'):
+            thisTrialLoop.status = STARTED
         currentLoop = trialLoop
         thisExp.timestampOnFlip(win, 'thisRow.t', format=globalClock.format)
         if thisSession is not None:
@@ -644,11 +683,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         frameN = -1
         
         # --- Run Routine "startTrial" ---
-        # if trial has changed, end Routine now
-        if isinstance(trialLoop, data.TrialHandler2) and thisTrialLoop.thisN != trialLoop.thisTrial.thisN:
-            continueRoutine = False
         startTrial.forceEnded = routineForceEnded = not continueRoutine
         while continueRoutine:
+            # if trial has changed, end Routine now
+            if hasattr(thisTrialLoop, 'status') and thisTrialLoop.status == STOPPING:
+                continueRoutine = False
             # get current time
             t = routineTimer.getTime()
             tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -715,8 +754,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 pauseExperiment(
                     thisExp=thisExp, 
                     win=win, 
-                    timers=[routineTimer], 
-                    playbackComponents=[]
+                    timers=[routineTimer, globalClock], 
+                    currentRoutine=startTrial,
                 )
                 # skip the frame we paused on
                 continue
@@ -797,11 +836,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         frameN = -1
         
         # --- Run Routine "Trial" ---
-        # if trial has changed, end Routine now
-        if isinstance(trialLoop, data.TrialHandler2) and thisTrialLoop.thisN != trialLoop.thisTrial.thisN:
-            continueRoutine = False
         Trial.forceEnded = routineForceEnded = not continueRoutine
         while continueRoutine:
+            # if trial has changed, end Routine now
+            if hasattr(thisTrialLoop, 'status') and thisTrialLoop.status == STOPPING:
+                continueRoutine = False
             # get current time
             t = routineTimer.getTime()
             tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -974,8 +1013,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 pauseExperiment(
                     thisExp=thisExp, 
                     win=win, 
-                    timers=[routineTimer], 
-                    playbackComponents=[trial_sound]
+                    timers=[routineTimer, globalClock], 
+                    currentRoutine=Trial,
                 )
                 # skip the frame we paused on
                 continue
@@ -1024,11 +1063,14 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         # create an object to store info about Routine ITI
         ITI = data.Routine(
             name='ITI',
-            components=[ITI_cross],
+            components=[ITI_cross, washout],
         )
         ITI.status = NOT_STARTED
         continueRoutine = True
         # update component parameters for each repeat
+        washout.setSound('stimuli/noise.wav', secs=2, hamming=True)
+        washout.setVolume(0.1, log=False)
+        washout.seek(0)
         # Run 'Begin Routine' code from prepNextTrial_2
         press_times = space_press.rt
         release_times = space_release.rt
@@ -1061,11 +1103,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         frameN = -1
         
         # --- Run Routine "ITI" ---
-        # if trial has changed, end Routine now
-        if isinstance(trialLoop, data.TrialHandler2) and thisTrialLoop.thisN != trialLoop.thisTrial.thisN:
-            continueRoutine = False
         ITI.forceEnded = routineForceEnded = not continueRoutine
         while continueRoutine and routineTimer.getTime() < 2.0:
+            # if trial has changed, end Routine now
+            if hasattr(thisTrialLoop, 'status') and thisTrialLoop.status == STOPPING:
+                continueRoutine = False
             # get current time
             t = routineTimer.getTime()
             tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -1107,6 +1149,34 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     ITI_cross.status = FINISHED
                     ITI_cross.setAutoDraw(False)
             
+            # *washout* updates
+            
+            # if washout is starting this frame...
+            if washout.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+                # keep track of start time/frame for later
+                washout.frameNStart = frameN  # exact frame index
+                washout.tStart = t  # local t and not account for scr refresh
+                washout.tStartRefresh = tThisFlipGlobal  # on global time
+                # add timestamp to datafile
+                thisExp.addData('washout.started', tThisFlipGlobal)
+                # update status
+                washout.status = STARTED
+                washout.play(when=win)  # sync with win flip
+            
+            # if washout is stopping this frame...
+            if washout.status == STARTED:
+                # is it time to stop? (based on global clock, using actual start)
+                if tThisFlipGlobal > washout.tStartRefresh + 2-frameTolerance or washout.isFinished:
+                    # keep track of stop time/frame for later
+                    washout.tStop = t  # not accounting for scr refresh
+                    washout.tStopRefresh = tThisFlipGlobal  # on global time
+                    washout.frameNStop = frameN  # exact frame index
+                    # add timestamp to datafile
+                    thisExp.timestampOnFlip(win, 'washout.stopped')
+                    # update status
+                    washout.status = FINISHED
+                    washout.stop()
+            
             # check for quit (typically the Esc key)
             if defaultKeyboard.getKeys(keyList=["escape"]):
                 thisExp.status = FINISHED
@@ -1118,8 +1188,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 pauseExperiment(
                     thisExp=thisExp, 
                     win=win, 
-                    timers=[routineTimer], 
-                    playbackComponents=[]
+                    timers=[routineTimer, globalClock], 
+                    currentRoutine=ITI,
                 )
                 # skip the frame we paused on
                 continue
@@ -1146,14 +1216,14 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         ITI.tStop = globalClock.getTime(format='float')
         ITI.tStopRefresh = tThisFlipGlobal
         thisExp.addData('ITI.stopped', ITI.tStop)
+        washout.pause()  # ensure sound has stopped at end of Routine
         # Run 'End Routine' code from prepNextTrial_2
         staircase.addResponse(resp)  # response = 0 (integrated) or 1 (segregated)
         try:
             nextDF = staircase.next()
-            feedback = "Proportion of correct: " + str(prop) + ", Resp was therefore: " + str(resp) + ", Next df will be: " + "{:.2f}".format(nextDF) 
+            feedback = f"Integrated percept time proportion: {prop}, Resp was therefore: {resp}, Next df will be: {nextDF:.2f}"
             print(feedback)
-            stimFile = 'stimuli\ABA\df_' + "{:.2f}".format(nextDF) + '_jitter_0.wav'
-            
+            stimFile = f"stimuli\ABA\df_{nextDF:.2f}_jitter_0.wav"
         except StopIteration:
             reversal_intensities = staircase.reversalIntensities
             jnd = sum(reversal_intensities) / len(reversal_intensities)
@@ -1165,9 +1235,23 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             routineTimer.reset()
         else:
             routineTimer.addTime(-2.000000)
+        # mark thisTrialLoop as finished
+        if hasattr(thisTrialLoop, 'status'):
+            thisTrialLoop.status = FINISHED
+        # if awaiting a pause, pause now
+        if trialLoop.status == PAUSED:
+            thisExp.status = PAUSED
+            pauseExperiment(
+                thisExp=thisExp, 
+                win=win, 
+                timers=[globalClock], 
+            )
+            # once done pausing, restore running status
+            trialLoop.status = STARTED
         thisExp.nextEntry()
         
     # completed 99.0 repeats of 'trialLoop'
+    trialLoop.status = FINISHED
     
     if thisSession is not None:
         # if running in a Session with a Liaison client, send data up to now
@@ -1235,8 +1319,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             pauseExperiment(
                 thisExp=thisExp, 
                 win=win, 
-                timers=[routineTimer], 
-                playbackComponents=[]
+                timers=[routineTimer, globalClock], 
+                currentRoutine=logJND,
             )
             # skip the frame we paused on
             continue
@@ -1311,6 +1395,9 @@ def endExperiment(thisExp, win=None):
     logging.console.setLevel(logging.WARNING)
     # mark experiment handler as finished
     thisExp.status = FINISHED
+    # run any 'at exit' functions
+    for fcn in runAtExit:
+        fcn()
     logging.flush()
 
 
