@@ -5,7 +5,7 @@ close all
 clear
 clc
 
-cd("D:\Projects\ABAmeta\stimGen")
+cd("E:\BrunoM\PhD\ABAmeta\stimGen")
 addpath(genpath(pwd))
 
 %% Constant variables and parameters
@@ -18,7 +18,7 @@ trigger_len = 0.125; % s - trigger pulse duration
 amp = -20; % db - envelope power
 
 % Amplitude and envelope parameters
-envelope_ramp_len = 0.05; % ratio - sin^2 envelope's ramp duration (between 0 to 0.5)
+envelope_ramp_len = 0.075; % ratio - sin^2 envelope's ramp duration (between 0 to 0.5)
 
 % Pitch parameters
 FA = 400; % Hz - A seqeunce frequency
