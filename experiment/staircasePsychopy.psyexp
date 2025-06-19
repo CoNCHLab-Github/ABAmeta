@@ -256,7 +256,7 @@
         <Param val="True" valType="str" updates="None" name="resample"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
         <Param val="$stimFile" valType="str" updates="set every repeat" name="sound"/>
-        <Param val="4.0" valType="code" updates="None" name="speakerIndex"/>
+        <Param val="7.0" valType="code" updates="None" name="speakerIndex"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
         <Param val="time (s)" valType="str" updates="None" name="startType"/>
         <Param val="0.0" valType="code" updates="None" name="startVal"/>
@@ -382,7 +382,7 @@
         <Param val="True" valType="str" updates="None" name="resample"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
         <Param val="stimuli/noise.wav" valType="str" updates="set every repeat" name="sound"/>
-        <Param val="6.0" valType="code" updates="None" name="speakerIndex"/>
+        <Param val="7.0" valType="code" updates="None" name="speakerIndex"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
         <Param val="time (s)" valType="str" updates="None" name="startType"/>
         <Param val="0.0" valType="code" updates="None" name="startVal"/>
@@ -391,7 +391,7 @@
         <Param val="True" valType="bool" updates="constant" name="stopWithRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="syncScreenRefresh"/>
         <Param val="" valType="code" updates="None" name="validator"/>
-        <Param val="0.1" valType="num" updates="constant" name="volume"/>
+        <Param val="0.01" valType="num" updates="constant" name="volume"/>
       </SoundComponent>
       <CodeComponent name="prepNextTrial_2" plugin="None">
         <Param val="" valType="extendedCode" updates="constant" name="Before Experiment"/>
