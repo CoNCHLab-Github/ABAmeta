@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" ?>
-<PsychoPy2experiment encoding="utf-8" version="2024.2.4">
+<PsychoPy2experiment encoding="utf-8" version="2025.1.1">
   <Settings>
     <Param val="3" valType="str" updates="None" name="Audio latency priority"/>
     <Param val="ptb" valType="str" updates="None" name="Audio lib"/>
@@ -47,6 +47,7 @@
     <Param val="RIGHT_EYE" valType="str" updates="None" name="elTrackEyes"/>
     <Param val="PUPIL_CR_TRACKING" valType="str" updates="None" name="elTrackingMode"/>
     <Param val="ABA_pilot" valType="str" updates="None" name="expName"/>
+    <Param val="" valType="str" updates="None" name="expVersion"/>
     <Param val="on Sync" valType="str" updates="None" name="exportHTML"/>
     <Param val="None" valType="str" updates="None" name="eyetracker"/>
     <Param val="" valType="code" updates="None" name="frameRate"/>
@@ -325,11 +326,14 @@
         <Param val="" valType="str" updates="None" name="deviceLabel"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="False" valType="bool" updates="constant" name="forceEndRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="hamming"/>
+        <Param val="1" valType="code" updates="None" name="latencyClass"/>
         <Param val="trial_ABA_sequence" valType="code" updates="None" name="name"/>
+        <Param val="True" valType="str" updates="None" name="resample"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
         <Param val="$stimuli" valType="str" updates="set every repeat" name="sound"/>
-        <Param val="4.0" valType="code" updates="None" name="speakerIndex"/>
+        <Param val="8.0" valType="code" updates="None" name="speakerIndex"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
         <Param val="time (s)" valType="str" updates="None" name="startType"/>
         <Param val="0.0" valType="code" updates="None" name="startVal"/>
@@ -337,7 +341,8 @@
         <Param val="7.0" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="constant" name="stopWithRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="syncScreenRefresh"/>
-        <Param val="0.5" valType="num" updates="constant" name="volume"/>
+        <Param val="" valType="code" updates="None" name="validator"/>
+        <Param val="0.2" valType="num" updates="constant" name="volume"/>
       </SoundComponent>
       <KeyboardComponent name="trial_key_resp" plugin="None">
         <Param val="'q','p'" valType="list" updates="constant" name="allowedKeys"/>
@@ -411,29 +416,29 @@
         <Param val="triggerCode" valType="code" updates="None" name="name"/>
       </CodeComponent>
       <MarkEvents name="MarkEvents" plugin="psychopy-eyelink">
-        <Param val="" valType="str" updates="None" name="componentsForEyeLinkInterestAreaMessages"/>
-        <Param val="trial_key_resp" valType="str" updates="None" name="componentsForEyeLinkRespEventMessages"/>
-        <Param val="" valType="str" updates="None" name="componentsForEyeLinkStimDVDrawingMessages"/>
-        <Param val="trial_ABA_sequence" valType="str" updates="None" name="componentsForEyeLinkStimEventMessages"/>
-        <Param val="" valType="str" updates="None" name="componentsForEyeLinkTargetPositionMessages"/>
+        <Param val="" valType="str" updates="None" plugin="psychopy-eyelink" name="componentsForEyeLinkInterestAreaMessages"/>
+        <Param val="trial_key_resp" valType="str" updates="None" plugin="psychopy-eyelink" name="componentsForEyeLinkRespEventMessages"/>
+        <Param val="" valType="str" updates="None" plugin="psychopy-eyelink" name="componentsForEyeLinkStimDVDrawingMessages"/>
+        <Param val="trial_ABA_sequence" valType="str" updates="None" plugin="psychopy-eyelink" name="componentsForEyeLinkStimEventMessages"/>
+        <Param val="" valType="str" updates="None" plugin="psychopy-eyelink" name="componentsForEyeLinkTargetPositionMessages"/>
         <Param val="True" valType="bool" updates="None" name="disabled"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
-        <Param val="True" valType="bool" updates="None" name="includeAllEventMarkedComponentsForDVDrawingMessages"/>
-        <Param val="False" valType="bool" updates="None" name="includeAllEventMarkedComponentsForIAMessages"/>
-        <Param val="0" valType="str" updates="None" name="interestAreaMargins"/>
-        <Param val="Rectangle" valType="str" updates="constant" name="interestAreaShape"/>
+        <Param val="True" valType="bool" updates="None" plugin="psychopy-eyelink" name="includeAllEventMarkedComponentsForDVDrawingMessages"/>
+        <Param val="False" valType="bool" updates="None" plugin="psychopy-eyelink" name="includeAllEventMarkedComponentsForIAMessages"/>
+        <Param val="0" valType="str" updates="None" plugin="psychopy-eyelink" name="interestAreaMargins"/>
+        <Param val="Rectangle" valType="str" updates="constant" plugin="psychopy-eyelink" name="interestAreaShape"/>
         <Param val="MarkEvents" valType="code" updates="None" name="name"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
-        <Param val="False" valType="bool" updates="None" name="sendTrialOnsetOffsetMessages"/>
-        <Param val="False" valType="bool" updates="None" name="sendVideoFrameMessages"/>
+        <Param val="False" valType="bool" updates="None" plugin="psychopy-eyelink" name="sendTrialOnsetOffsetMessages"/>
+        <Param val="False" valType="bool" updates="None" plugin="psychopy-eyelink" name="sendVideoFrameMessages"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
         <Param val="time (s)" valType="str" updates="None" name="startType"/>
         <Param val="0.0" valType="code" updates="None" name="startVal"/>
         <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
         <Param val="0.001" valType="code" updates="constant" name="stopVal"/>
         <Param val="False" valType="bool" updates="None" name="syncScreenRefresh"/>
-        <Param val="trig" valType="str" updates="None" name="trialConditionVariablesForEyeLinkLogging"/>
-        <Param val="True" valType="bool" updates="None" name="useQuitKeys"/>
+        <Param val="trig" valType="str" updates="None" plugin="psychopy-eyelink" name="trialConditionVariablesForEyeLinkLogging"/>
+        <Param val="True" valType="bool" updates="None" plugin="psychopy-eyelink" name="useQuitKeys"/>
       </MarkEvents>
     </Routine>
     <Routine name="Prep">
@@ -506,11 +511,11 @@
         <Param val="False" valType="bool" updates="None" name="useWindowParams"/>
       </RoutineSettingsComponent>
       <InitializeConnection name="Initialize" plugin="psychopy-eyelink">
-        <Param val="True" valType="bool" updates="None" name="disableEyeLinkAudio"/>
+        <Param val="True" valType="bool" updates="None" plugin="psychopy-eyelink" name="disableEyeLinkAudio"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
-        <Param val="False" valType="bool" updates="None" name="dummyMode"/>
+        <Param val="False" valType="bool" updates="None" plugin="psychopy-eyelink" name="dummyMode"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
-        <Param val="100.1.1.1" valType="str" updates="None" name="hostAddress"/>
+        <Param val="100.1.1.1" valType="str" updates="None" plugin="psychopy-eyelink" name="hostAddress"/>
         <Param val="Initialize" valType="code" updates="None" name="name"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
@@ -519,16 +524,16 @@
         <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
         <Param val="0.001" valType="code" updates="constant" name="stopVal"/>
         <Param val="False" valType="bool" updates="None" name="syncScreenRefresh"/>
-        <Param val="False" valType="bool" updates="None" name="useCustomHostIP"/>
+        <Param val="False" valType="bool" updates="None" plugin="psychopy-eyelink" name="useCustomHostIP"/>
       </InitializeConnection>
       <CameraSetup name="CameraSetup" plugin="psychopy-eyelink">
-        <Param val="win.color" valType="str" updates="None" name="backgroundColor"/>
-        <Param val="'qbeep.wav','type.wav','error.wav'" valType="str" updates="None" name="calibrationFilenames"/>
-        <Param val="defaults" valType="str" updates="constant" name="calibrationSounds"/>
-        <Param val="HV9" valType="str" updates="constant" name="calibrationType"/>
+        <Param val="win.color" valType="str" updates="None" plugin="psychopy-eyelink" name="backgroundColor"/>
+        <Param val="'qbeep.wav','type.wav','error.wav'" valType="str" updates="None" plugin="psychopy-eyelink" name="calibrationFilenames"/>
+        <Param val="defaults" valType="str" updates="constant" plugin="psychopy-eyelink" name="calibrationSounds"/>
+        <Param val="HV9" valType="str" updates="constant" plugin="psychopy-eyelink" name="calibrationType"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
-        <Param val="(1,1,1)" valType="str" updates="None" name="foregroundColor"/>
+        <Param val="(1,1,1)" valType="str" updates="None" plugin="psychopy-eyelink" name="foregroundColor"/>
         <Param val="CameraSetup" valType="code" updates="None" name="name"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
@@ -537,9 +542,9 @@
         <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
         <Param val="0.001" valType="code" updates="constant" name="stopVal"/>
         <Param val="False" valType="bool" updates="None" name="syncScreenRefresh"/>
-        <Param val="" valType="str" updates="None" name="targetFilename"/>
-        <Param val="24" valType="str" updates="None" name="targetSize"/>
-        <Param val="circle" valType="str" updates="constant" name="targetType"/>
+        <Param val="" valType="str" updates="None" plugin="psychopy-eyelink" name="targetFilename"/>
+        <Param val="24" valType="str" updates="None" plugin="psychopy-eyelink" name="targetSize"/>
+        <Param val="circle" valType="str" updates="constant" plugin="psychopy-eyelink" name="targetType"/>
       </CameraSetup>
     </Routine>
     <Routine name="EyeStart">
@@ -652,11 +657,14 @@
         <Param val="" valType="str" updates="None" name="deviceLabel"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="False" valType="bool" updates="constant" name="forceEndRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="hamming"/>
+        <Param val="1" valType="code" updates="None" name="latencyClass"/>
         <Param val="washout" valType="code" updates="None" name="name"/>
+        <Param val="True" valType="str" updates="None" name="resample"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
         <Param val="stimuli/noise.wav" valType="str" updates="set every repeat" name="sound"/>
-        <Param val="-1" valType="code" updates="None" name="speakerIndex"/>
+        <Param val="8.0" valType="code" updates="None" name="speakerIndex"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
         <Param val="time (s)" valType="str" updates="None" name="startType"/>
         <Param val="0.0" valType="code" updates="None" name="startVal"/>
@@ -664,7 +672,8 @@
         <Param val="2" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="constant" name="stopWithRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="syncScreenRefresh"/>
-        <Param val="0.5" valType="num" updates="constant" name="volume"/>
+        <Param val="" valType="code" updates="None" name="validator"/>
+        <Param val="0.01" valType="num" updates="constant" name="volume"/>
       </SoundComponent>
     </Routine>
     <Routine name="Spacebar_Trial">
@@ -717,11 +726,14 @@
         <Param val="" valType="str" updates="None" name="deviceLabel"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
+        <Param val="False" valType="bool" updates="constant" name="forceEndRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="hamming"/>
+        <Param val="1" valType="code" updates="None" name="latencyClass"/>
         <Param val="trial_sound" valType="code" updates="None" name="name"/>
+        <Param val="True" valType="str" updates="None" name="resample"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
         <Param val="$stimFile" valType="str" updates="set every repeat" name="sound"/>
-        <Param val="4.0" valType="code" updates="None" name="speakerIndex"/>
+        <Param val="8.0" valType="code" updates="None" name="speakerIndex"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
         <Param val="time (s)" valType="str" updates="None" name="startType"/>
         <Param val="0.0" valType="code" updates="None" name="startVal"/>
@@ -729,7 +741,8 @@
         <Param val="stimDuration" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="constant" name="stopWithRoutine"/>
         <Param val="True" valType="bool" updates="constant" name="syncScreenRefresh"/>
-        <Param val="0.5" valType="num" updates="constant" name="volume"/>
+        <Param val="" valType="code" updates="None" name="validator"/>
+        <Param val="0.2" valType="num" updates="constant" name="volume"/>
       </SoundComponent>
       <KeyboardComponent name="space_release" plugin="None">
         <Param val="'space'" valType="list" updates="constant" name="allowedKeys"/>
@@ -806,29 +819,29 @@
         <Param val="test" valType="code" updates="None" name="name"/>
       </CodeComponent>
       <MarkEvents name="MarkEvents_space" plugin="psychopy-eyelink">
-        <Param val="" valType="str" updates="None" name="componentsForEyeLinkInterestAreaMessages"/>
-        <Param val="" valType="str" updates="None" name="componentsForEyeLinkRespEventMessages"/>
-        <Param val="" valType="str" updates="None" name="componentsForEyeLinkStimDVDrawingMessages"/>
-        <Param val="trial_sound" valType="str" updates="None" name="componentsForEyeLinkStimEventMessages"/>
-        <Param val="" valType="str" updates="None" name="componentsForEyeLinkTargetPositionMessages"/>
+        <Param val="" valType="str" updates="None" plugin="psychopy-eyelink" name="componentsForEyeLinkInterestAreaMessages"/>
+        <Param val="" valType="str" updates="None" plugin="psychopy-eyelink" name="componentsForEyeLinkRespEventMessages"/>
+        <Param val="" valType="str" updates="None" plugin="psychopy-eyelink" name="componentsForEyeLinkStimDVDrawingMessages"/>
+        <Param val="trial_sound" valType="str" updates="None" plugin="psychopy-eyelink" name="componentsForEyeLinkStimEventMessages"/>
+        <Param val="" valType="str" updates="None" plugin="psychopy-eyelink" name="componentsForEyeLinkTargetPositionMessages"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
-        <Param val="True" valType="bool" updates="None" name="includeAllEventMarkedComponentsForDVDrawingMessages"/>
-        <Param val="False" valType="bool" updates="None" name="includeAllEventMarkedComponentsForIAMessages"/>
-        <Param val="0" valType="str" updates="None" name="interestAreaMargins"/>
-        <Param val="Rectangle" valType="str" updates="constant" name="interestAreaShape"/>
+        <Param val="True" valType="bool" updates="None" plugin="psychopy-eyelink" name="includeAllEventMarkedComponentsForDVDrawingMessages"/>
+        <Param val="False" valType="bool" updates="None" plugin="psychopy-eyelink" name="includeAllEventMarkedComponentsForIAMessages"/>
+        <Param val="0" valType="str" updates="None" plugin="psychopy-eyelink" name="interestAreaMargins"/>
+        <Param val="Rectangle" valType="str" updates="constant" plugin="psychopy-eyelink" name="interestAreaShape"/>
         <Param val="MarkEvents_space" valType="code" updates="None" name="name"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
-        <Param val="False" valType="bool" updates="None" name="sendTrialOnsetOffsetMessages"/>
-        <Param val="False" valType="bool" updates="None" name="sendVideoFrameMessages"/>
+        <Param val="False" valType="bool" updates="None" plugin="psychopy-eyelink" name="sendTrialOnsetOffsetMessages"/>
+        <Param val="False" valType="bool" updates="None" plugin="psychopy-eyelink" name="sendVideoFrameMessages"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
         <Param val="time (s)" valType="str" updates="None" name="startType"/>
         <Param val="0.0" valType="code" updates="None" name="startVal"/>
         <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
         <Param val="0.001" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="None" name="syncScreenRefresh"/>
-        <Param val="trig" valType="str" updates="None" name="trialConditionVariablesForEyeLinkLogging"/>
-        <Param val="True" valType="bool" updates="None" name="useQuitKeys"/>
+        <Param val="trig" valType="str" updates="None" plugin="psychopy-eyelink" name="trialConditionVariablesForEyeLinkLogging"/>
+        <Param val="True" valType="bool" updates="None" plugin="psychopy-eyelink" name="useQuitKeys"/>
       </MarkEvents>
     </Routine>
     <Routine name="startTrial">
@@ -900,8 +913,8 @@
         <Param val="" valType="extendedCode" updates="constant" name="Before JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
-        <Param val="/* Syntax Error: Fix Python code */" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="pickedJitter = random.choice(jitter)&amp;#10;&amp;#10;if condition == 99:&amp;#10;    dfVal = pptJND&amp;#10;else:&amp;#10;    dfVal = condition&amp;#10;&amp;#10;&amp;#10;stimFile = &quot;stimuli/ABA/&quot; +  &quot;df_&quot; + &quot;{:.2f}&quot;.format(dfVal) + &quot;_jitter_&quot; + str(pickedJitter) + &quot;.wav&quot;&amp;#10;&amp;#10;&amp;#10;thisExp.addData('jitter', pickedJitter)&amp;#10;thisExp.addData('stimFile', stimFile)" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="pickedJitter = Math.random.choice(jitter);&amp;#10;if ((condition === 99)) {&amp;#10;    dfVal = pptJND;&amp;#10;} else {&amp;#10;    dfVal = condition;&amp;#10;}&amp;#10;stimFile = `stimuli/ABA/df_${util.pad(Number.parseFloat(dfVal).toFixed(2), 1)}_jitter_${pickedJitter}.wav`;&amp;#10;psychoJS.experiment.addData(&quot;jitter&quot;, pickedJitter);&amp;#10;psychoJS.experiment.addData(&quot;stimFile&quot;, stimFile);&amp;#10;" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
+        <Param val="pickedJitter = random.choice(jitter)&amp;#10;&amp;#10;if condition == 99:&amp;#10;    dfVal = pptJND&amp;#10;else:&amp;#10;    dfVal = condition&amp;#10;&amp;#10;&amp;#10;stimFile = f&quot;stimuli/ABA/df_{dfVal:.2f}_jitter_{pickedJitter}.wav&quot;&amp;#10;&amp;#10;&amp;#10;thisExp.addData('jitter', pickedJitter)&amp;#10;thisExp.addData('stimFile', stimFile)" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Auto-&gt;JS" valType="str" updates="None" name="Code Type"/>
         <Param val="keys = event.getKeys()&amp;#10;if 'b' in keys and 'p' in keys:&amp;#10;        core.quit()" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="var _pj;&amp;#10;function _pj_snippets(container) {&amp;#10;    function in_es6(left, right) {&amp;#10;        if (((right instanceof Array) || ((typeof right) === &quot;string&quot;))) {&amp;#10;            return (right.indexOf(left) &gt; (- 1));&amp;#10;        } else {&amp;#10;            if (((right instanceof Map) || (right instanceof Set) || (right instanceof WeakMap) || (right instanceof WeakSet))) {&amp;#10;                return right.has(left);&amp;#10;            } else {&amp;#10;                return (left in right);&amp;#10;            }&amp;#10;        }&amp;#10;    }&amp;#10;    container[&quot;in_es6&quot;] = in_es6;&amp;#10;    return container;&amp;#10;}&amp;#10;_pj = {};&amp;#10;_pj_snippets(_pj);&amp;#10;keys = psychoJS.eventManager.getKeys();&amp;#10;if ((_pj.in_es6(&quot;b&quot;, keys) &amp;&amp; _pj.in_es6(&quot;p&quot;, keys))) {&amp;#10;    core.quit();&amp;#10;}&amp;#10;" valType="extendedCode" updates="constant" name="Each JS Frame"/>
@@ -931,25 +944,25 @@
         <Param val="False" valType="bool" updates="None" name="useWindowParams"/>
       </RoutineSettingsComponent>
       <DriftCheck name="DriftCheck" plugin="psychopy-eyelink">
-        <Param val="win.color" valType="str" updates="None" name="backgroundColor"/>
+        <Param val="win.color" valType="str" updates="None" plugin="psychopy-eyelink" name="backgroundColor"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
-        <Param val="'qbeep.wav','type.wav','error.wav'" valType="str" updates="None" name="driftCheckFilenames"/>
-        <Param val="off" valType="str" updates="constant" name="driftCheckSounds"/>
+        <Param val="'qbeep.wav','type.wav','error.wav'" valType="str" updates="None" plugin="psychopy-eyelink" name="driftCheckFilenames"/>
+        <Param val="off" valType="str" updates="constant" plugin="psychopy-eyelink" name="driftCheckSounds"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
-        <Param val="(1,1,1)" valType="str" updates="None" name="foregroundColor"/>
+        <Param val="(1,1,1)" valType="str" updates="None" plugin="psychopy-eyelink" name="foregroundColor"/>
         <Param val="DriftCheck" valType="code" updates="None" name="name"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
-        <Param val="pix" valType="str" updates="constant" name="screenUnitType"/>
+        <Param val="pix" valType="str" updates="constant" plugin="psychopy-eyelink" name="screenUnitType"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
         <Param val="time (s)" valType="str" updates="None" name="startType"/>
         <Param val="0.0" valType="code" updates="None" name="startVal"/>
         <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
         <Param val="0.001" valType="code" updates="constant" name="stopVal"/>
         <Param val="False" valType="bool" updates="None" name="syncScreenRefresh"/>
-        <Param val="" valType="str" updates="None" name="targetFilename"/>
-        <Param val="[0,0]" valType="str" updates="None" name="targetPosition"/>
-        <Param val="24" valType="str" updates="None" name="targetSize"/>
-        <Param val="circle" valType="str" updates="constant" name="targetType"/>
+        <Param val="" valType="str" updates="None" plugin="psychopy-eyelink" name="targetFilename"/>
+        <Param val="[0,0]" valType="str" updates="None" plugin="psychopy-eyelink" name="targetPosition"/>
+        <Param val="24" valType="str" updates="None" plugin="psychopy-eyelink" name="targetSize"/>
+        <Param val="circle" valType="str" updates="constant" plugin="psychopy-eyelink" name="targetType"/>
       </DriftCheck>
     </Routine>
   </Routines>

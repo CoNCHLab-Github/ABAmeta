@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2025.1.1),
-    on June 16, 2025, at 18:16
+    on June 19, 2025, at 14:08
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -282,7 +282,7 @@ def setupDevices(expInfo, thisExp, win):
     deviceManager.addDevice(
         deviceName='trial_sound',
         deviceClass='psychopy.hardware.speaker.SpeakerDevice',
-        index=4.0,
+        index=7.0,
         resample='True',
         latencyClass=1,
     )
@@ -302,7 +302,7 @@ def setupDevices(expInfo, thisExp, win):
     deviceManager.addDevice(
         deviceName='washout',
         deviceClass='psychopy.hardware.speaker.SpeakerDevice',
-        index=6.0,
+        index=7.0,
         resample='True',
         latencyClass=1,
     )
@@ -459,7 +459,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         hamming=True, 
         speaker='washout',    name='washout'
     )
-    washout.setVolume(0.1)
+    washout.setVolume(0.01)
     
     # --- Initialize components for Routine "logJND" ---
     
@@ -1069,7 +1069,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         continueRoutine = True
         # update component parameters for each repeat
         washout.setSound('stimuli/noise.wav', secs=2, hamming=True)
-        washout.setVolume(0.1, log=False)
+        washout.setVolume(0.01, log=False)
         washout.seek(0)
         # Run 'Begin Routine' code from prepNextTrial_2
         press_times = space_press.rt

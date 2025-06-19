@@ -1,8 +1,8 @@
 ﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-This experiment was created using PsychoPy3 Experiment Builder (v2024.2.4),
-    on June 04, 2025, at 16:46
+This experiment was created using PsychoPy3 Experiment Builder (v2025.1.1),
+    on June 19, 2025, at 14:09
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -17,11 +17,12 @@ from psychopy import prefs
 from psychopy import plugins
 plugins.activatePlugins()
 prefs.hardware['audioLib'] = 'ptb'
-prefs.hardware['audioLatencyMode'] = '3'
 from psychopy import sound, gui, visual, core, data, event, logging, clock, colors, layout, hardware
 from psychopy.tools import environmenttools
-from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
-                                STOPPED, FINISHED, PRESSED, RELEASED, FOREVER, priority)
+from psychopy.constants import (
+    NOT_STARTED, STARTED, PLAYING, PAUSED, STOPPED, STOPPING, FINISHED, PRESSED, 
+    RELEASED, FOREVER, priority
+)
 
 import numpy as np  # whole numpy lib is available, prepend 'np.'
 from numpy import (sin, cos, tan, log, log10, pi, average,
@@ -33,379 +34,17 @@ import sys  # to get file system encoding
 import psychopy.iohub as io
 from psychopy.hardware import keyboard
 
-# This section of the EyeLink Initialize component code imports some
-# modules we need, manages data filenames, allows for dummy mode configuration
-# (for testing experiments without an eye tracker), connects to the tracker,
-# and defines some helper functions (which can be called later)
-import pylink
-import time
-import platform
-from PIL import Image  # for preparing the Host backdrop image
-from EyeLinkCoreGraphicsPsychoPy import EyeLinkCoreGraphicsPsychoPy
-from string import ascii_letters, digits
-from psychopy import gui
-
-import psychopy_eyelink
-print('EyeLink Plugin For PsychoPy Version = ' + str(psychopy_eyelink.__version__))
-
-script_path = os.path.dirname(sys.argv[0])
-if len(script_path) != 0:
-    os.chdir(script_path)
-
-# Set this variable to True if you use the built-in retina screen as your
-# primary display device on macOS. If have an external monitor, set this
-# variable True if you choose to "Optimize for Built-in Retina Display"
-# in the Displays preference settings.
-use_retina = False
-
-# Set this variable to True to run the script in "Dummy Mode"
-dummy_mode = False
-
-# Prompt user to specify an EDF data filename
-# before we open a fullscreen window
-dlg_title = "Enter EDF Filename"
-dlg_prompt = "Please enter a file name with 8 or fewer characters [letters, numbers, and underscore]."
-# loop until we get a valid filename
-while True:
-    dlg = gui.Dlg(dlg_title)
-    dlg.addText(dlg_prompt)
-    dlg.addField("Filename",initial="Test",label="EDF Filename")
-    # show dialog and wait for OK or Cancel
-    ok_data = dlg.show()
-    if dlg.OK:  # if ok_data is not None
-        print("EDF data filename: {}".format(ok_data["Filename"]))
-    else:
-        print("user cancelled")
-        core.quit()
-        sys.exit()
-
-    # get the string entered by the experimenter
-    tmp_str = ok_data["Filename"]
-    # strip trailing characters, ignore the ".edf" extension
-    edf_fname = tmp_str.rstrip().split(".")[0]
-
-    # check if the filename is valid (length <= 8 & no special char)
-    allowed_char = ascii_letters + digits + "_"
-    if not all([c in allowed_char for c in edf_fname]):
-        print("ERROR: Invalid EDF filename")
-    elif len(edf_fname) > 8:
-        print("ERROR: EDF filename should not exceed 8 characters")
-    else:
-        break# Set up a folder to store the EDF data files and the associated resources
-# e.g., files defining the interest areas used in each trial
-results_folder = "results"
-if not os.path.exists(results_folder):
-    os.makedirs(results_folder)
-
-# We download EDF data file from the EyeLink Host PC to the local hard
-# drive at the end of each testing session, here we rename the EDF to
-# include session start date/time
-time_str = time.strftime("_%Y_%m_%d_%H_%M", time.localtime())
-session_identifier = edf_fname + time_str
-
-# create a folder for the current testing session in the "results" folder
-session_folder = os.path.join(results_folder, session_identifier)
-if not os.path.exists(session_folder):
-    os.makedirs(session_folder)
-
-# For macOS users check if they have a retina screen
-if 'Darwin' in platform.system():
-    dlg = gui.Dlg("Retina Screen?")
-    dlg.addText("What type of screen will the experiment run on?")
-    dlg.addField("Screen Type", choices=["High Resolution (Retina, 2k, 4k, 5k)", "Standard Resolution (HD or lower)"])
-    # show dialog and wait for OK or Cancel
-    ok_data = dlg.show()
-    if dlg.OK:
-        if dlg.data["Screen Type"] == "High Resolution (Retina, 2k, 4k, 5k)":  
-            use_retina = True
-        else:
-            use_retina = False
-    else:
-        print('user cancelled')
-        core.quit()
-        sys.exit()
-
-# Connect to the EyeLink Host PC
-# The Host IP address, by default, is "100.1.1.1".
-# the "el_tracker" objected created here can be accessed through the Pylink
-# Set the Host PC address to "None" (without quotes) to run the script
-# in "Dummy Mode"
-if dummy_mode:
-    el_tracker = pylink.EyeLink(None)
-else:
-    try:
-        el_tracker = pylink.EyeLink("100.1.1.1")
-    except RuntimeError as error:
-        dlg = gui.Dlg("Dummy Mode?")
-        dlg.addText("Could not connect to tracker at 100.1.1.1 -- continue in Dummy Mode?")
-        # show dialog and wait for OK or Cancel
-        ok_data = dlg.show()
-        if dlg.OK:  # if ok_data is not None
-            dummy_mode = True
-            el_tracker = pylink.EyeLink(None)
-        else:
-            print("user cancelled")
-            core.quit()
-            sys.exit()
-
-eyelinkThisFrameCallOnFlipScheduled = False
-eyelinkLastFlipTime = 0.0
-zeroTimeIAS = 0.0
-zeroTimeDLF = 0.0
-sentIASFileMessage = False
-sentDrawListMessage = False
-
-def clear_screen(win,genv):
-    """ clear up the PsychoPy window"""
-    win.fillColor = genv.getBackgroundColor()
-    win.flip()
-
-def show_msg(win, genv, text, wait_for_keypress=True):
-    """ Show task instructions on screen"""
-    scn_width, scn_height = win.size
-    msg = visual.TextStim(win, text,
-                          color=genv.getForegroundColor(),
-                          wrapWidth=scn_width/2)
-    clear_screen(win,genv)
-    msg.draw()
-    win.flip()
-
-    # wait indefinitely, terminates upon any key press
-    if wait_for_keypress:
-        kb = keyboard.Keyboard()
-        waitKeys = kb.waitKeys(keyList=None, waitRelease=True, clear=True)
-        clear_screen(win,genv)
-
-def terminate_task(win,genv,edf_file,session_folder,session_identifier):
-    """ Terminate the task gracefully and retrieve the EDF data file
-    """
-    el_tracker = pylink.getEYELINK()
-
-    if el_tracker.isConnected():
-        # Terminate the current trial first if the task terminated prematurely
-        error = el_tracker.isRecording()
-        if error == pylink.TRIAL_OK:
-            abort_trial(win,genv)
-
-        # Put tracker in Offline mode
-        el_tracker.setOfflineMode()
-
-        # Clear the Host PC screen and wait for 500 ms
-        el_tracker.sendCommand('clear_screen 0')
-        pylink.msecDelay(500)
-
-        # Close the edf data file on the Host
-        el_tracker.closeDataFile()
-
-        # Show a file transfer message on the screen
-        msg = 'EDF data is transferring from EyeLink Host PC...'
-        show_msg(win, genv, msg, wait_for_keypress=False)
-
-        # Download the EDF data file from the Host PC to a local data folder
-        # parameters: source_file_on_the_host, destination_file_on_local_drive
-        local_edf = os.path.join(session_folder, session_identifier + '.EDF')
-        try:
-            el_tracker.receiveDataFile(edf_file, local_edf)
-        except RuntimeError as error:
-            print('ERROR:', error)
-
-        # Close the link to the tracker.
-        el_tracker.close()
-
-    # close the PsychoPy window
-    win.close()
-
-    # quit PsychoPy
-    core.quit()
-    sys.exit()
-
-def abort_trial(win,genv):
-    """Ends recording """
-    el_tracker = pylink.getEYELINK()
-
-    # Stop recording
-    if el_tracker.isRecording():
-        # add 100 ms to catch final trial events
-        pylink.pumpDelay(100)
-        el_tracker.stopRecording()
-
-    # clear the screen
-    clear_screen(win,genv)
-    # Send a message to clear the Data Viewer screen
-    bgcolor_RGB = (116, 116, 116)
-    el_tracker.sendMessage('!V CLEAR %d %d %d' % bgcolor_RGB)
-
-    # send a message to mark trial end
-    el_tracker.sendMessage('TRIAL_RESULT %d' % pylink.TRIAL_ERROR)
-    return pylink.TRIAL_ERROR
-
-# this method converts PsychoPy position values to EyeLink position values
-# EyeLink position values are in pixel units and are such that 0,0 corresponds 
-# to the top-left corner of the screen and increase as position moves right/down
-def eyelink_pos(pos,winSize,unitType):
-    screenUnitType = unitType
-    scn_width,scn_height = winSize
-    if screenUnitType == 'pix':
-        elPos = [pos[0] + scn_width/2,scn_height/2 - pos[1]]
-    elif screenUnitType == 'height':
-        elPos = [scn_width/2 + pos[0] * scn_height,scn_height/2 + pos[1] * scn_height]
-    elif screenUnitType == "norm":
-        elPos = [(scn_width/2 * pos[0]) + scn_width/2,scn_height/2 + pos[1] * scn_height]
-    else:
-        print("ERROR:  Only pixel, height, and norm units supported for conversion to EyeLink position units")
-    return [int(round(elPos[0])),int(round(elPos[1]))]
-
-# this method converts PsychoPy size values to EyeLink size values
-# EyeLink size values are in pixels
-def eyelink_size(size,winSize,unitType):
-    screenUnitType = unitType
-    scn_width,scn_height = winSize
-    if len(size) == 1:
-        size = [size[0],size[0]]
-    if screenUnitType == 'pix':
-        elSize = [size[0],size[1]]
-    elif screenUnitType == 'height':
-        elSize = [int(round(scn_height*size[0])),int(round(scn_height*size[1]))]
-    elif screenUnitType == "norm":
-        elSize = [size[0]/2 * scn_width,size[1]/2 * scn_height]
-    else:
-        print("ERROR:  Only pixel, height, and norm units supported for conversion to EyeLink position units")
-    return [int(round(elSize[0])),int(round(elSize[1]))]
-
-# this method converts PsychoPy color values to EyeLink color values
-def eyelink_color(color):
-    elColor = (int(round((win.color[0]+1)/2*255)),int(round((win.color[1]+1)/2*255)),int(round((win.color[2]+1)/2*255)))
-    return elColor
-
-
-# This method, created by the EyeLink MarkEvents_space component code, will get called to handle
-# sending event marking messages, logging Data Viewer (DV) stimulus drawing info, logging DV interest area info,
-# sending DV Target Position Messages, and/or logging DV video frame marking info=information
-def eyelink_onFlip_MarkEvents_space(globalClock,win,scn_width,scn_height,allStimComponentsForEyeLinkMonitoring,\
-    componentsForEyeLinkStimEventMessages,\
-    componentsForEyeLinkStimDVDrawingMessages,dlf,dlf_file):
-    global eyelinkThisFrameCallOnFlipScheduled,eyelinkLastFlipTime,zeroTimeDLF,sentDrawListMessage
-    # this variable becomes true whenever a component offsets, so we can 
-    # send Data Viewer messgaes to clear the screen and redraw still-present 
-    # components.  set it to false until a screen clear is needed
-    needToUpdateDVDrawingFromScreenClear = False
-    # store a list of all components that need Data Viewer drawing messages 
-    # sent for this screen retrace
-    componentsForDVDrawingList = []
-    # Log the time of the current frame onset for upcoming messaging/event logging
-    currentFrameTime = float(globalClock.getTime())
-
-    # Go through all stimulus components that need to be checked (for event marking,
-    # DV drawing, and/or interest area logging) to see if any have just ONSET
-    for thisComponent in allStimComponentsForEyeLinkMonitoring:
-        # Check if the component has just onset
-        if thisComponent.tStartRefresh is not None and not thisComponent.elOnsetDetected:
-            # Check whether we need to mark stimulus onset (and log a trial variable logging this time) for the component
-            if thisComponent in componentsForEyeLinkStimEventMessages:
-                el_tracker.sendMessage('%s %s_ONSET' % (int(round((globalClock.getTime()-thisComponent.tStartRefresh)*1000)),thisComponent.name))
-                el_tracker.sendMessage('!V TRIAL_VAR %s_ONSET_TIME %i' % (thisComponent.name,thisComponent.tStartRefresh*1000))
-                # Convert the component's position to EyeLink units and log this value under .elPos
-                # Also create lastelPos/lastelSize to store pos/size of the previous position, which is needed for IAS file writing
-                if thisComponent.componentType != 'sound':
-                    thisComponent.elPos = eyelink_pos(thisComponent.pos,[scn_width,scn_height],thisComponent.units)
-                    thisComponent.elSize = eyelink_size(thisComponent.size,[scn_width,scn_height],thisComponent.units)
-                    thisComponent.lastelPos = thisComponent.elPos
-                    thisComponent.lastelSize = thisComponent.elSize
-            if not sentDrawListMessage and not dlf_file.closed:
-                # send an IAREA FILE command message to let Data Viewer know where
-                # to find the IAS file to load interest area information
-                zeroTimeDLF = float(currentFrameTime)
-                # send a DRAW_LIST command message to let Data Viewer know where
-                # to find the drawing messages to correctly present the stimuli
-                el_tracker.sendMessage('%s !V DRAW_LIST graphics/%s' % (int(round((globalClock.getTime()-currentFrameTime)*1000))-3,dlf))
-                dlf_file.write('0 CLEAR %d %d %d\n' % eyelink_color(win.color))
-                sentDrawListMessage = True
-
-            if thisComponent in componentsForEyeLinkStimDVDrawingMessages:
-                componentsForDVDrawingList.append(thisComponent)
-
-            thisComponent.elOnsetDetected = True
-
-    # Check whether any components that are being monitored for EyeLink purposes have changed position
-    for thisComponent in allStimComponentsForEyeLinkMonitoring:
-        if thisComponent.componentType != 'sound':
-            # Get the updated position in EyeLink Units
-            thisComponent.elPos = eyelink_pos(thisComponent.pos,[scn_width,scn_height],thisComponent.units)
-            if thisComponent.elPos[0] != thisComponent.lastelPos[0] or thisComponent.elPos[1] != thisComponent.lastelPos[1]\
-                and thisComponent.elOnsetDetected:
-                # Only get an updated size if position has changed
-                thisComponent.elSize = eyelink_size(thisComponent.size,[scn_width,scn_height],thisComponent.units)
-                # log that we need to update the screen drawing with a clear command
-                # and a redrawing of all still-present components
-                if thisComponent in componentsForEyeLinkStimDVDrawingMessages:
-                    needToUpdateDVDrawingFromScreenClear = True
-
-                # update the position (in EyeLink coordinates) for upcoming usage
-        if thisComponent.componentType != 'sound':
-            thisComponent.lastelPos = thisComponent.elPos
-            thisComponent.lastelSize = thisComponent.elSize
-    # Go through all stimulus components that need to be checked (for event marking,
-    # DV drawing, and/or interest area logging) to see if any have just OFFSET
-    for thisComponent in allStimComponentsForEyeLinkMonitoring:
-        # Check if the component has just offset
-        if thisComponent.tStopRefresh is not None and thisComponent.tStartRefresh is not None and \
-            not thisComponent.elOffsetDetected:
-            # send a message marking that component's offset in the EDF
-            if thisComponent in componentsForEyeLinkStimEventMessages:
-                el_tracker.sendMessage('%s %s_OFFSET' % (int(round((globalClock.getTime()-thisComponent.tStopRefresh)*1000)),thisComponent.name))
-            # log that we need to update the screen drawing with a clear command
-            # and a redrawing of all still-present components
-            if thisComponent in componentsForEyeLinkStimDVDrawingMessages:
-                needToUpdateDVDrawingFromScreenClear = True
-            thisComponent.elOffsetDetected = True 
-    # Send drawing messages to the draw list file so that the stimuli/placeholders can be viewed in 
-    # Data Viewer's Trial View window
-    # See the Data Viewer User Manual, sections:
-    # Protocol for EyeLink Data to Viewer Integration -> Image Commands/Simple Drawing Commands
-    # If any component has offsetted on this frame then send a clear message
-    # followed by logging to send draw commands for all still-present components
-    if needToUpdateDVDrawingFromScreenClear and not dlf_file.closed:
-        dlf_file.write('%i CLEAR ' % (int(round((zeroTimeDLF - currentFrameTime)*1000)))
-            + '%d %d %d\n' % eyelink_color(win.color))
-
-        for thisComponent in componentsForEyeLinkStimDVDrawingMessages:
-            if thisComponent.elOnsetDetected and not thisComponent.elOffsetDetected and thisComponent not in componentsForDVDrawingList:
-                componentsForDVDrawingList.append(thisComponent)
-
-    for thisComponent in componentsForDVDrawingList:
-        if not dlf_file.closed:
-            # If it is an image component then send an image loading message
-            if thisComponent.componentType == "Image":
-                dlf_file.write('%i IMGLOAD CENTER ../../%s %i %i %i %i\n' % 
-                    (int(round((zeroTimeDLF - currentFrameTime)*1000)),
-                   thisComponent.image,thisComponent.elPos[0],
-                    thisComponent.elPos[1],thisComponent.elSize[0],thisComponent.elSize[1]))
-            # If it is a sound component then skip the stimulus drawing message
-            elif thisComponent.componentType == "sound" or thisComponent.componentType == "MovieStim3" or thisComponent.componentType == "MovieStimWithFrameNum":
-                pass
-            # If it is any other non-movie visual stimulus component then send
-            # a draw command to provide a placeholder box in Data Viewer's Trial View window
-            else:
-                dlf_file.write('%i DRAWBOX 255 0 0 %i %i %i %i\n' % 
-                    (int(round((zeroTimeDLF - currentFrameTime)*1000)),
-                    thisComponent.elPos[0]-thisComponent.elSize[0]/2,
-                    thisComponent.elPos[1]-thisComponent.elSize[1]/2,
-                    thisComponent.elPos[0]+thisComponent.elSize[0]/2,
-                    thisComponent.elPos[1]+thisComponent.elSize[1]/2))
-    # This logs whether a call to this method has already been scheduled for the upcoming retrace
-    # And is used to help ensure we schedule only one callOnFlip call for each retrace
-    eyelinkThisFrameCallOnFlipScheduled = False
-    # This stores the time of the last retrace and can be used in Code components to 
-    # check the time of the previous screen flip
-    eyelinkLastFlipTime = float(currentFrameTime)
 # --- Setup global variables (available in all functions) ---
 # create a device manager to handle hardware (keyboards, mice, mirophones, speakers, etc.)
 deviceManager = hardware.DeviceManager()
 # ensure that relative paths start from the same directory as this script
 _thisDir = os.path.dirname(os.path.abspath(__file__))
 # store info about the experiment session
-psychopyVersion = '2024.2.4'
+psychopyVersion = '2025.1.1'
 expName = 'ABA_pilot'  # from the Builder filename that created this script
+expVersion = ''
+# a list of functions to run when the experiment ends (starts off blank)
+runAtExit = []
 # information about this experiment
 expInfo = {
     'participant': f"{randint(0, 999999):06.0f}",
@@ -413,6 +52,7 @@ expInfo = {
     'runs': '10',
     'date|hid': data.getDateStr(),
     'expName|hid': expName,
+    'expVersion|hid': expVersion,
     'psychopyVersion|hid': psychopyVersion,
 }
 
@@ -434,6 +74,9 @@ if PILOTING:
         _fullScr = False
         # set window size
         _winSize = prefs.piloting['forcedWindowSize']
+    # replace default participant ID
+    if prefs.piloting['replaceParticipantID']:
+        expInfo['participant'] = 'pilot'
 
 def showExpInfoDlg(expInfo):
     """
@@ -490,9 +133,9 @@ def setupData(expInfo, dataDir=None):
     
     # an ExperimentHandler isn't essential but helps with data saving
     thisExp = data.ExperimentHandler(
-        name=expName, version='',
+        name=expName, version=expVersion,
         extraInfo=expInfo, runtimeInfo=None,
-        originPath='E:\\ABAMeta\\experiment\\ABA_pilot_lastrun.py',
+        originPath='D:\\Projects\\ABAmeta\\experiment\\ABA_pilot_lastrun.py',
         savePickle=True, saveWideText=True,
         dataFileName=dataDir + os.sep + filename, sortColumns='time'
     )
@@ -580,9 +223,13 @@ def setupWindow(expInfo=None, win=None):
             win._monitorFrameRate = win.getActualFrameRate(infoMsg='Attempting to measure frame rate of screen, please wait...')
         expInfo['frameRate'] = win._monitorFrameRate
     win.hideMessage()
-    # show a visual indicator if we're in piloting mode
-    if PILOTING and prefs.piloting['showPilotingIndicator']:
-        win.showPilotingIndicator()
+    if PILOTING:
+        # show a visual indicator if we're in piloting mode
+        if prefs.piloting['showPilotingIndicator']:
+            win.showPilotingIndicator()
+        # always show the mouse in piloting mode
+        if prefs.piloting['forceMouseVisible']:
+            win.mouseVisible = True
     
     return win
 
@@ -636,7 +283,9 @@ def setupDevices(expInfo, thisExp, win):
     deviceManager.addDevice(
         deviceName='trial_sound',
         deviceClass='psychopy.hardware.speaker.SpeakerDevice',
-        index=4.0
+        index=8.0,
+        resample='True',
+        latencyClass=1,
     )
     if deviceManager.getDevice('space_release') is None:
         # initialise space_release
@@ -654,7 +303,9 @@ def setupDevices(expInfo, thisExp, win):
     deviceManager.addDevice(
         deviceName='washout',
         deviceClass='psychopy.hardware.speaker.SpeakerDevice',
-        index=-1
+        index=8.0,
+        resample='True',
+        latencyClass=1,
     )
     if deviceManager.getDevice('break_key_resp') is None:
         # initialise break_key_resp
@@ -665,7 +316,7 @@ def setupDevices(expInfo, thisExp, win):
     # return True if completed successfully
     return True
 
-def pauseExperiment(thisExp, win=None, timers=[], playbackComponents=[]):
+def pauseExperiment(thisExp, win=None, timers=[], currentRoutine=None):
     """
     Pause this experiment, preventing the flow from advancing to the next routine until resumed.
     
@@ -678,8 +329,8 @@ def pauseExperiment(thisExp, win=None, timers=[], playbackComponents=[]):
         Window for this experiment.
     timers : list, tuple
         List of timers to reset once pausing is finished.
-    playbackComponents : list, tuple
-        List of any components with a `pause` method which need to be paused.
+    currentRoutine : psychopy.data.Routine
+        Current Routine we are in at time of pausing, if any. This object tells PsychoPy what Components to pause/play/dispatch.
     """
     # if we are not paused, do nothing
     if thisExp.status != PAUSED:
@@ -688,8 +339,9 @@ def pauseExperiment(thisExp, win=None, timers=[], playbackComponents=[]):
     # start a timer to figure out how long we're paused for
     pauseTimer = core.Clock()
     # pause any playback components
-    for comp in playbackComponents:
-        comp.pause()
+    if currentRoutine is not None:
+        for comp in currentRoutine.getPlaybackComponents():
+            comp.pause()
     # make sure we have a keyboard
     defaultKeyboard = deviceManager.getDevice('defaultKeyboard')
     if defaultKeyboard is None:
@@ -700,14 +352,19 @@ def pauseExperiment(thisExp, win=None, timers=[], playbackComponents=[]):
         )
     # run a while loop while we wait to unpause
     while thisExp.status == PAUSED:
+        # dispatch messages on response components
+        if currentRoutine is not None:
+            for comp in currentRoutine.getDispatchComponents():
+                comp.device.dispatchMessages()
         # sleep 1ms so other threads can execute
         clock.time.sleep(0.001)
     # if stop was requested while paused, quit
     if thisExp.status == FINISHED:
         endExperiment(thisExp, win=win)
     # resume any playback components
-    for comp in playbackComponents:
-        comp.play()
+    if currentRoutine is not None:
+        for comp in currentRoutine.getPlaybackComponents():
+            comp.play()
     # reset any timers
     for timer in timers:
         timer.addTime(-pauseTimer.getTime())
@@ -763,71 +420,14 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # --- Initialize components for Routine "Prep" ---
     # Run 'Begin Experiment' code from stimSetup
     stimDuration = 16
-    # This section of the EyeLink Initialize component code opens an EDF file,
-    # writes some header text to the file, and configures some tracker settings
-    el_tracker = pylink.getEYELINK()
-    global edf_fname
-    # Open an EDF data file on the Host PC
-    edf_file = edf_fname + ".EDF"
-    try:
-        el_tracker.openDataFile(edf_file)
-    except RuntimeError as err:
-        print("ERROR:", err)
-        # close the link if we have one open
-        if el_tracker.isConnected():
-            el_tracker.close()
-        core.quit()
-        sys.exit()
-    
-    # Add a header text to the EDF file to identify the current experiment name
-    # This is OPTIONAL. If your text starts with "RECORDED BY " it will be
-    # available in DataViewer's Inspector window by clicking
-    # the EDF session node in the top panel and looking for the "Recorded By:"
-    # field in the bottom panel of the Inspector.
-    preamble_text = 'RECORDED BY %s EyeLink Plugin Version %s ' % (os.path.basename(__file__),psychopy_eyelink.__version__)
-    el_tracker.sendCommand("add_file_preamble_text '%s'" % preamble_text)
-    
-    # Configure the tracker
-    #
-    # Put the tracker in offline mode before we change tracking parameters
-    el_tracker.setOfflineMode()
-    
-    # Get the software version:  1-EyeLink I, 2-EyeLink II, 3/4-EyeLink 1000,
-    # 5-EyeLink 1000 Plus, 6-Portable DUO
-    eyelink_ver = 0  # set version to 0, in case running in Dummy mode
-    if not dummy_mode:
-        vstr = el_tracker.getTrackerVersionString()
-        eyelink_ver = int(vstr.split()[-1].split(".")[0])
-        # print out some version info in the shell
-        print("Running experiment on %s, version %d" % (vstr, eyelink_ver))
-    
-    # File and Link data control
-    # what eye events to save in the EDF file, include everything by default
-    file_event_flags = 'LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON,INPUT'
-    # what eye events to make available over the link, include everything by default
-    link_event_flags = 'LEFT,RIGHT,FIXATION,SACCADE,BLINK,BUTTON,FIXUPDATE,INPUT'
-    # what sample data to save in the EDF data file and to make available
-    # over the link, include the 'HTARGET' flag to save head target sticker
-    # data for supported eye trackers
-    if eyelink_ver > 3:
-        file_sample_flags = 'LEFT,RIGHT,GAZE,HREF,RAW,AREA,HTARGET,GAZERES,BUTTON,STATUS,INPUT'
-        link_sample_flags = 'LEFT,RIGHT,GAZE,GAZERES,AREA,HTARGET,STATUS,INPUT'
-    else:
-        file_sample_flags = 'LEFT,RIGHT,GAZE,HREF,RAW,AREA,GAZERES,BUTTON,STATUS,INPUT'
-        link_sample_flags = 'LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,INPUT'
-    el_tracker.sendCommand("file_event_filter = %s" % file_event_flags)
-    el_tracker.sendCommand("file_sample_data = %s" % file_sample_flags)
-    el_tracker.sendCommand("link_event_filter = %s" % link_event_flags)
-    el_tracker.sendCommand("link_sample_data = %s" % link_sample_flags)
-    # Set a gamepad button to accept calibration/drift check target
-    # You need a supported gamepad/button box that is connected to the Host PC
-    el_tracker.sendCommand("button_function 5 'accept_target_fixation'")
-    
-    global eyelinkThisFrameCallOnFlipScheduled,eyelinkLastFlipTime,zeroTimeDLF,sentDrawListMessage,zeroTimeIAS,sentIASFileMessage
     
     # --- Initialize components for Routine "EyeSetup" ---
-    Initialize = event.Mouse(win=win)
-    CameraSetup = event.Mouse(win=win)
+    
+    # Unknown component ignored: Initialize
+    
+    
+    # Unknown component ignored: CameraSetup
+    
     
     # --- Initialize components for Routine "startTrial" ---
     startTrialtxt = visual.TextStim(win=win, name='startTrialtxt',
@@ -840,7 +440,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     startTrialspace = keyboard.Keyboard(deviceName='startTrialspace')
     
     # --- Initialize components for Routine "EyeStart" ---
-    StartRecord = event.Mouse(win=win)
+    
+    # Unknown component ignored: StartRecord
+    
     
     # --- Initialize components for Routine "Spacebar_Trial" ---
     trial_cross = visual.ShapeStim(
@@ -857,13 +459,17 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         hamming=True, 
         speaker='trial_sound',    name='trial_sound'
     )
-    trial_sound.setVolume(0.5)
+    trial_sound.setVolume(0.2)
     space_release = keyboard.Keyboard(deviceName='space_release')
     space_press = keyboard.Keyboard(deviceName='space_press')
-    MarkEvents_space = event.Mouse(win=win)
+    
+    # Unknown component ignored: MarkEvents_space
+    
     
     # --- Initialize components for Routine "EyeStop" ---
-    StopRecord = event.Mouse(win=win)
+    
+    # Unknown component ignored: StopRecord
+    
     
     # --- Initialize components for Routine "ITI" ---
     ITI_cross = visual.ShapeStim(
@@ -880,10 +486,12 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         hamming=True, 
         speaker='washout',    name='washout'
     )
-    washout.setVolume(0.5)
+    washout.setVolume(0.01)
     
     # --- Initialize components for Routine "driftCheck" ---
-    DriftCheck = event.Mouse(win=win)
+    
+    # Unknown component ignored: DriftCheck
+    
     
     # --- Initialize components for Routine "Break" ---
     break_message = visual.TextStim(win=win, name='break_message',
@@ -984,8 +592,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             pauseExperiment(
                 thisExp=thisExp, 
                 win=win, 
-                timers=[routineTimer], 
-                playbackComponents=[]
+                timers=[routineTimer, globalClock], 
+                currentRoutine=Prep,
             )
             # skip the frame we paused on
             continue
@@ -1062,8 +670,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             pauseExperiment(
                 thisExp=thisExp, 
                 win=win, 
-                timers=[routineTimer], 
-                playbackComponents=[]
+                timers=[routineTimer, globalClock], 
+                currentRoutine=EyeSetup,
             )
             # skip the frame we paused on
             continue
@@ -1090,89 +698,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     EyeSetup.tStop = globalClock.getTime(format='float')
     EyeSetup.tStopRefresh = tThisFlipGlobal
     thisExp.addData('EyeSetup.stopped', EyeSetup.tStop)
-    # This section of the EyeLink Initialize component code gets graphic 
-    # information from Psychopy, sets the screen_pixel_coords on the Host PC based
-    # on these values, and logs the screen resolution for Data Viewer via 
-    # a DISPLAY_COORDS message
-    
-    # get the native screen resolution used by PsychoPy
-    scn_width, scn_height = win.size
-    # resolution fix for Mac retina displays
-    if 'Darwin' in platform.system():
-        if use_retina:
-            scn_width = int(scn_width/2.0)
-            scn_height = int(scn_height/2.0)
-    
-    # Pass the display pixel coordinates (left, top, right, bottom) to the tracker
-    # see the EyeLink Installation Guide, "Customizing Screen Settings"
-    el_coords = "screen_pixel_coords = 0 0 %d %d" % (scn_width - 1, scn_height - 1)
-    el_tracker.sendCommand(el_coords)
-    
-    # Write a DISPLAY_COORDS message to the EDF file
-    # Data Viewer needs this piece of info for proper visualization, see Data
-    # Viewer User Manual, "Protocol for EyeLink Data to Viewer Integration"
-    dv_coords = "DISPLAY_COORDS  0 0 %d %d" % (scn_width - 1, scn_height - 1)
-    el_tracker.sendMessage(dv_coords)# This Begin Experiment tab of the elTrial component just initializes
-    # a trial counter variable at the beginning of the experiment
-    trial_index = 1
-    # Configure a graphics environment (genv) for tracker calibration
-    genv = EyeLinkCoreGraphicsPsychoPy(el_tracker, win, True)
-    print(genv)  # print out the version number of the CoreGraphics library
-    
-    # resolution fix for macOS retina display issues
-    if use_retina:
-        genv.fixMacRetinaDisplay()
-    # Request Pylink to use the PsychoPy window we opened above for calibration
-    pylink.openGraphicsEx(genv)
-    # Create an array of pixels to assist in transferring content to the Host PC backdrop
-    rgbBGColor = eyelink_color(win.color)
-    blankHostPixels = [[rgbBGColor for i in range(scn_width)]
-        for j in range(scn_height)]
-    # This section of EyeLink CameraSetup component code configures some
-    # graphics options for calibration, and then performs a camera setup
-    # so that you can set up the eye tracker and calibrate/validate the participant
-    # graphics options for calibration, and then performs a camera setup
-    # so that you can set up the eye tracker and calibrate/validate the participant
-    
-    # Set background and foreground colors for the calibration target
-    # in PsychoPy, (-1, -1, -1)=black, (1, 1, 1)=white, (0, 0, 0)=mid-gray
-    background_color = win.color
-    foreground_color = (1,1,1)
-    genv.setCalibrationColors(foreground_color, background_color)
-    
-    # Set up the calibration/validation target
-    #
-    # The target could be a "circle" (default), a "picture", a "movie" clip,
-    # or a rotating "spiral". To configure the type of drift check target, set
-    # genv.setTargetType to "circle", "picture", "movie", or "spiral", e.g.,
-    genv.setTargetType('circle')
-    #
-    genv.setTargetSize(24)
-    
-    # Beeps to play during calibration, validation and drift correction
-    # parameters: target, good, error
-    #     target -- sound to play when target moves
-    #     good -- sound to play on successful operation
-    #     error -- sound to play on failure or interruption
-    # Each parameter could be ''--default sound, 'off'--no sound, or a wav file
-    genv.setCalibrationSounds('', '', '')
-    
-    # Choose a calibration type, H3, HV3, HV5, HV13 (HV = horizontal/vertical),
-    el_tracker.sendCommand("calibration_type = " 'HV9')
-    #clear the screen before we begin Camera Setup mode
-    clear_screen(win,genv)
-    
-    
-    # Go into Camera Setup mode so that participant setup/EyeLink calibration/validation can be performed
-    # skip this step if running the script in Dummy Mode
-    if not dummy_mode:
-        try:
-            el_tracker.doTrackerSetup()
-        except RuntimeError as err:
-            print('ERROR:', err)
-            el_tracker.exitCalibration()
-        else:
-            win.mouseVisible = False
     # using non-slip timing so subtract the expected duration of this Routine (unless ended on request)
     if EyeSetup.maxDurationReached:
         routineTimer.addTime(-EyeSetup.maxDuration)
@@ -1200,6 +725,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             globals()[paramName] = thisBlock[paramName]
     
     for thisBlock in Blocks:
+        Blocks.status = STARTED
+        if hasattr(thisBlock, 'status'):
+            thisBlock.status = STARTED
         currentLoop = Blocks
         thisExp.timestampOnFlip(win, 'thisRow.t', format=globalClock.format)
         # abbreviate parameter names if possible (e.g. rgb = thisBlock.rgb)
@@ -1228,6 +756,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             thisSession.sendExperimentData()
         
         for thisTrial in trials:
+            trials.status = STARTED
+            if hasattr(thisTrial, 'status'):
+                thisTrial.status = STARTED
             currentLoop = trials
             thisExp.timestampOnFlip(win, 'thisRow.t', format=globalClock.format)
             if thisSession is not None:
@@ -1260,7 +791,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 dfVal = condition
             
             
-            stimFile = "stimuli/ABA/" +  "df_" + "{:.2f}".format(dfVal) + "_jitter_" + str(pickedJitter) + ".wav"
+            stimFile = f"stimuli/ABA/df_{dfVal:.2f}_jitter_{pickedJitter}.wav"
             
             
             thisExp.addData('jitter', pickedJitter)
@@ -1286,11 +817,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             frameN = -1
             
             # --- Run Routine "startTrial" ---
-            # if trial has changed, end Routine now
-            if isinstance(trials, data.TrialHandler2) and thisTrial.thisN != trials.thisTrial.thisN:
-                continueRoutine = False
             startTrial.forceEnded = routineForceEnded = not continueRoutine
             while continueRoutine:
+                # if trial has changed, end Routine now
+                if hasattr(thisTrial, 'status') and thisTrial.status == STOPPING:
+                    continueRoutine = False
                 # get current time
                 t = routineTimer.getTime()
                 tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -1357,8 +888,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     pauseExperiment(
                         thisExp=thisExp, 
                         win=win, 
-                        timers=[routineTimer], 
-                        playbackComponents=[]
+                        timers=[routineTimer, globalClock], 
+                        currentRoutine=startTrial,
                     )
                     # skip the frame we paused on
                     continue
@@ -1425,11 +956,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             frameN = -1
             
             # --- Run Routine "EyeStart" ---
-            # if trial has changed, end Routine now
-            if isinstance(trials, data.TrialHandler2) and thisTrial.thisN != trials.thisTrial.thisN:
-                continueRoutine = False
             EyeStart.forceEnded = routineForceEnded = not continueRoutine
             while continueRoutine and routineTimer.getTime() < 0.001:
+                # if trial has changed, end Routine now
+                if hasattr(thisTrial, 'status') and thisTrial.status == STOPPING:
+                    continueRoutine = False
                 # get current time
                 t = routineTimer.getTime()
                 tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -1444,8 +975,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     pauseExperiment(
                         thisExp=thisExp, 
                         win=win, 
-                        timers=[routineTimer], 
-                        playbackComponents=[]
+                        timers=[routineTimer, globalClock], 
+                        currentRoutine=EyeStart,
                     )
                     # skip the frame we paused on
                     continue
@@ -1472,42 +1003,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             EyeStart.tStop = globalClock.getTime(format='float')
             EyeStart.tStopRefresh = tThisFlipGlobal
             thisExp.addData('EyeStart.stopped', EyeStart.tStop)
-            # This section of EyeLink StartRecord component code starts eye tracker recording,
-            # sends a trial start (i.e., TRIALID) message to the EDF, 
-            # and logs which eye is tracked
-            
-            # get a reference to the currently active EyeLink connection
-            el_tracker = pylink.getEYELINK()
-            # Send a "TRIALID" message to mark the start of a trial, see the following Data Viewer User Manual:
-            # "Protocol for EyeLink Data to Viewer Integration -> Defining the Start and End of a Trial"
-            el_tracker.sendMessage('TRIALID %d' % trial_index)
-            # Log the trial index at the start of recording in case there will be multiple trials within one recording
-            trialIDAtRecordingStart = int(trial_index)
-            # Log the routine index at the start of recording in case there will be multiple routines within one recording
-            routine_index = 1
-            # put tracker in idle/offline mode before recording
-            el_tracker.setOfflineMode()
-            # Start recording, logging all samples/events to the EDF and making all data available over the link
-            # arguments: sample_to_file, events_to_file, sample_over_link, events_over_link (1-yes, 0-no)
-            try:
-                el_tracker.startRecording(1, 1, 1, 1)
-            except RuntimeError as error:
-                print("ERROR:", error)
-                abort_trial(genv)
-            # Allocate some time for the tracker to cache some samples before allowing
-            # trial stimulus presentation to proceed
-            pylink.pumpDelay(100)
-            # determine which eye(s) is/are available
-            # 0-left, 1-right, 2-binocular
-            eye_used = el_tracker.eyeAvailable()
-            if eye_used == 1:
-                el_tracker.sendMessage("EYE_USED 1 RIGHT")
-            elif eye_used == 0 or eye_used == 2:
-                el_tracker.sendMessage("EYE_USED 0 LEFT")
-                eye_used = 0
-            else:
-                print("ERROR: Could not get eye information!")
-            #routineForceEnded = True
             # using non-slip timing so subtract the expected duration of this Routine (unless ended on request)
             if EyeStart.maxDurationReached:
                 routineTimer.addTime(-EyeStart.maxDuration)
@@ -1526,7 +1021,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             continueRoutine = True
             # update component parameters for each repeat
             trial_sound.setSound(stimFile, secs=stimDuration, hamming=True)
-            trial_sound.setVolume(0.5, log=False)
+            trial_sound.setVolume(0.2, log=False)
             trial_sound.seek(0)
             # create starting attributes for space_release
             space_release.keys = []
@@ -1540,99 +1035,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             countedKeysR = 0
             countedKeysP = 0
             #d.activate_line(bitmask=trig)
-            # This section of EyeLink MarkEvents_space component code initializes some variables that will help with
-            # sending event marking messages, logging Data Viewer (DV) stimulus drawing info, logging DV interest area info,
-            # sending DV Target Position Messages, and/or logging DV video frame marking info
-            # information
-            
-            
-            # log trial variables' values to the EDF data file, for details, see Data
-            # Viewer User Manual, "Protocol for EyeLink Data to Viewer Integration"
-            trialConditionVariablesForEyeLinkLogging = [trig]
-            trialConditionVariableNamesForEyeLinkLogging = ['trig']
-            for i in range(len(trialConditionVariablesForEyeLinkLogging)):
-                el_tracker.sendMessage('!V TRIAL_VAR %s %s'% (trialConditionVariableNamesForEyeLinkLogging[i],trialConditionVariablesForEyeLinkLogging[i]))
-                #add a brief pause after every 5 messages or so to make sure no messages are missed
-                if i % 5 == 0:
-                    time.sleep(0.001)
-            
-            # list of all stimulus components whose onset/offset will be marked with messages
-            componentsForEyeLinkStimEventMessages = [trial_sound]
-            # list of all stimulus components for which Data Viewer draw commands will be sent
-            componentsForEyeLinkStimDVDrawingMessages = [trial_sound]
-            # create list of all components to be monitored for EyeLink Marking/Messaging
-            allStimComponentsForEyeLinkMonitoring = componentsForEyeLinkStimEventMessages + componentsForEyeLinkStimDVDrawingMessages# make sure each component is only in the list once
-            allStimComponentsForEyeLinkMonitoring = [*set(allStimComponentsForEyeLinkMonitoring)]
-            # list of all response components whose onsets need to be marked and values
-            # need to be logged
-            
-            # Initialize stimulus components whose occurence needs to be monitored for event
-            # marking, Data Viewer integration, and/or interest area messaging
-            # to the EDF (provided they are supported stimulus types)
-            for thisComponent in allStimComponentsForEyeLinkMonitoring:
-                componentClassString = str(thisComponent.__class__)
-                supportedStimType = False
-                for stimType in ["Aperture","Text","Dot","Shape","Rect","Grating","Image","MovieStim3","Movie","sound"]:
-                    if stimType in componentClassString:
-                        supportedStimType = True
-                        thisComponent.elOnsetDetected = False
-                        thisComponent.elOffsetDetected = False
-                        if stimType != "sound":
-                            thisComponent.elPos = eyelink_pos(thisComponent.pos,[scn_width,scn_height],thisComponent.units)
-                            thisComponent.elSize = eyelink_size(thisComponent.size,[scn_width,scn_height],thisComponent.units)
-                            thisComponent.lastelPos = thisComponent.elPos
-                            thisComponent.lastelSize = thisComponent.elSize
-                        if stimType == "MovieStim3":
-                            thisComponent.componentType = "MovieStim3"
-                            thisComponent.elMarkingFrameIndex = -1
-                            thisComponent.previousFrameTime = 0
-                            thisComponent.firstFramePresented = False
-                        elif stimType == "Movie":
-                            thisComponent.componentType = "MovieStimWithFrameNum"
-                            thisComponent.elMarkingFrameIndex = -1
-                            thisComponent.firstFramePresented = False
-                        else:
-                            thisComponent.componentType = stimType
-                        break   
-                if not supportedStimType:
-                    print("WARNING:  Stimulus component type " + str(thisComponent.__class__) + " not supported for EyeLink event marking")
-                    print("          Event timing messages and/or Data Viewer drawing messages")
-                    print("          will not be marked for this component")
-                    print("          Consider marking the component via code component")
-                    # remove unsupported types from our monitoring lists
-                    allStimComponentsForEyeLinkMonitoring.remove(thisComponent)
-                    componentsForEyeLinkStimEventMessages.remove(thisComponent)
-                    componentsForEyeLinkStimDVDrawingMessages.remove(thisComponent)
-                    componentsForEyeLinkInterestAreaMessages.remove(thisComponent)
-            
-            # Open a draw list file (DLF) to which Data Viewer drawing information will be logged
-            # The commands that will be written to this DLF file will enable
-            # Data Viewer to reproduce the stimuli in its Trial View window
-            sentDrawListMessage = False
-            # create a folder for the current testing session in the "results" folder
-            drawList_folder = os.path.join(results_folder, session_identifier,"graphics")
-            if not os.path.exists(drawList_folder):
-                os.makedirs(drawList_folder)
-            # open a DRAW LIST file to save the frame timing info for the video, which will
-            # help us to be able to see the video in Data Viewer's Trial View window
-            # See the Data Viewer User Manual section:
-            # "Procotol for EyeLink Data to Viewer Integration -> Simple Drawing Commands"
-            dlf = 'TRIAL_%04d_ROUTINE_%02d.dlf' % (trial_index,routine_index)
-            dlf_file = open(os.path.join(drawList_folder, dlf), 'w')
-            
-            # Update a routine index for EyeLink IAS/DLF file logging -- 
-            # Each routine will have its own set of IAS/DLF files, as each will have its own  Mark Events component
-            routine_index = routine_index + 1
-            # Send a Data Viewer clear screen command to clear its Trial View window
-            # to the window color
-            el_tracker.sendMessage('!V CLEAR %d %d %d' % eyelink_color(win.color))
-            # create a keyboard instance and reinitialize a kePressNameList, which
-            # will store list of key names currently being pressed (to allow Ctrl-C abort)
-            kb = keyboard.Keyboard()
-            keyPressNameList = []
-            eyelinkThisFrameCallOnFlipScheduled = False
-            eyelinkLastFlipTime = 0.0
-            routineTimer.reset()
             # store start times for Spacebar_Trial
             Spacebar_Trial.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
             Spacebar_Trial.tStart = globalClock.getTime(format='float')
@@ -1654,11 +1056,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             frameN = -1
             
             # --- Run Routine "Spacebar_Trial" ---
-            # if trial has changed, end Routine now
-            if isinstance(trials, data.TrialHandler2) and thisTrial.thisN != trials.thisTrial.thisN:
-                continueRoutine = False
             Spacebar_Trial.forceEnded = routineForceEnded = not continueRoutine
             while continueRoutine:
+                # if trial has changed, end Routine now
+                if hasattr(thisTrial, 'status') and thisTrial.status == STOPPING:
+                    continueRoutine = False
                 # get current time
                 t = routineTimer.getTime()
                 tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -1821,39 +1223,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     countedKeysP += 1 # increase the keys that were counted
                     #d.activate_line(bitmask=100) # sent the trigger
                     el_tracker.sendMessage('Pressed')
-                # This section of EyeLink MarkEvents_space component code checks whether to send (and sends/logs when appropriate)
-                # event marking messages, log Data Viewer (DV) stimulus drawing info, log DV interest area info,
-                # send DV Target Position Messages, and/or log DV video frame marking info
-                if not eyelinkThisFrameCallOnFlipScheduled:
-                    # This method, created by the EyeLink MarkEvents_space component code will get called to handle
-                    # sending event marking messages, logging Data Viewer (DV) stimulus drawing info, logging DV interest area info,
-                    # sending DV Target Position Messages, and/or logging DV video frame marking info=information
-                    win.callOnFlip(eyelink_onFlip_MarkEvents_space,globalClock,win,scn_width,scn_height,allStimComponentsForEyeLinkMonitoring,\
-                        componentsForEyeLinkStimEventMessages,\
-                        componentsForEyeLinkStimDVDrawingMessages,dlf,dlf_file)
-                    eyelinkThisFrameCallOnFlipScheduled = True
-                
-                # abort the current trial if the tracker is no longer recording
-                error = el_tracker.isRecording()
-                if error is not pylink.TRIAL_OK:
-                    el_tracker.sendMessage('tracker_disconnected')
-                    abort_trial(win,genv)
-                
-                # check keyboard events for experiment abort key combination
-                keyPressList = kb.getKeys(keyList = ['lctrl','rctrl','c'], waitRelease = False, clear = False)
-                for keyPress in keyPressList:
-                    keyPressName = keyPress.name
-                    if keyPressName not in keyPressNameList:
-                        keyPressNameList.append(keyPress.name)
-                if ('lctrl' in keyPressNameList or 'rctrl' in keyPressNameList) and 'c' in keyPressNameList:
-                    el_tracker.sendMessage('terminated_by_user')
-                    terminate_task(win,genv,edf_file,session_folder,session_identifier)
-                #check for key releases
-                keyReleaseList = kb.getKeys(keyList = ['lctrl','rctrl','c'], waitRelease = True, clear = False)
-                for keyRelease in keyReleaseList:
-                    keyReleaseName = keyRelease.name
-                    if keyReleaseName in keyPressNameList:
-                        keyPressNameList.remove(keyReleaseName)
                 if thisExp.status == FINISHED or endExpNow:
                     endExperiment(thisExp, win=win)
                     return
@@ -1862,8 +1231,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     pauseExperiment(
                         thisExp=thisExp, 
                         win=win, 
-                        timers=[routineTimer], 
-                        playbackComponents=[trial_sound]
+                        timers=[routineTimer, globalClock], 
+                        currentRoutine=Spacebar_Trial,
                     )
                     # skip the frame we paused on
                     continue
@@ -1905,17 +1274,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             if space_press.keys != None:  # we had a response
                 trials.addData('space_press.rt', space_press.rt)
                 trials.addData('space_press.duration', space_press.duration)
-            
-            # This section of EyeLink MarkEvents_space component code does some event cleanup at the end of the routine
-            # Go through all stimulus components that need to be checked for event marking,
-            #  to see if the trial ended before PsychoPy reported OFFSET detection to mark their offset from trial end
-            for thisComponent in componentsForEyeLinkStimEventMessages:
-                if thisComponent.elOnsetDetected and not thisComponent.elOffsetDetected:
-                    # Check if the component had onset but the trial ended before offset
-                    el_tracker.sendMessage('%s_OFFSET' % (thisComponent.name))
-            # close the drawlist file (which is used in Data Viewer stimulus presntation re-creation)
-            dlf_file.close()
-            
             # the Routine "Spacebar_Trial" was not non-slip safe, so reset the non-slip timer
             routineTimer.reset()
             
@@ -1949,11 +1307,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             frameN = -1
             
             # --- Run Routine "EyeStop" ---
-            # if trial has changed, end Routine now
-            if isinstance(trials, data.TrialHandler2) and thisTrial.thisN != trials.thisTrial.thisN:
-                continueRoutine = False
             EyeStop.forceEnded = routineForceEnded = not continueRoutine
             while continueRoutine and routineTimer.getTime() < 0.001:
+                # if trial has changed, end Routine now
+                if hasattr(thisTrial, 'status') and thisTrial.status == STOPPING:
+                    continueRoutine = False
                 # get current time
                 t = routineTimer.getTime()
                 tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -1968,8 +1326,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     pauseExperiment(
                         thisExp=thisExp, 
                         win=win, 
-                        timers=[routineTimer], 
-                        playbackComponents=[]
+                        timers=[routineTimer, globalClock], 
+                        currentRoutine=EyeStop,
                     )
                     # skip the frame we paused on
                     continue
@@ -1996,16 +1354,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             EyeStop.tStop = globalClock.getTime(format='float')
             EyeStop.tStopRefresh = tThisFlipGlobal
             thisExp.addData('EyeStop.stopped', EyeStop.tStop)
-            # This section of EyeLink StopRecord component code stops recording, sends a trial end (TRIAL_RESULT)
-            # message to the EDF, and updates the trial_index variable 
-            el_tracker.stopRecording()
-            
-            # send a 'TRIAL_RESULT' message to mark the end of trial, see Data
-            # Viewer User Manual, "Protocol for EyeLink Data to Viewer Integration"
-            el_tracker.sendMessage('TRIAL_RESULT %d' % 0)
-            
-            # update the trial counter for the next trial
-            trial_index = trial_index + 1
             # using non-slip timing so subtract the expected duration of this Routine (unless ended on request)
             if EyeStop.maxDurationReached:
                 routineTimer.addTime(-EyeStop.maxDuration)
@@ -2024,7 +1372,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             continueRoutine = True
             # update component parameters for each repeat
             washout.setSound('stimuli/noise.wav', secs=2, hamming=True)
-            washout.setVolume(0.5, log=False)
+            washout.setVolume(0.01, log=False)
             washout.seek(0)
             # store start times for ITI
             ITI.tStartRefresh = win.getFutureFlipTime(clock=globalClock)
@@ -2047,11 +1395,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             frameN = -1
             
             # --- Run Routine "ITI" ---
-            # if trial has changed, end Routine now
-            if isinstance(trials, data.TrialHandler2) and thisTrial.thisN != trials.thisTrial.thisN:
-                continueRoutine = False
             ITI.forceEnded = routineForceEnded = not continueRoutine
             while continueRoutine and routineTimer.getTime() < 2.0:
+                # if trial has changed, end Routine now
+                if hasattr(thisTrial, 'status') and thisTrial.status == STOPPING:
+                    continueRoutine = False
                 # get current time
                 t = routineTimer.getTime()
                 tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -2128,8 +1476,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     pauseExperiment(
                         thisExp=thisExp, 
                         win=win, 
-                        timers=[routineTimer], 
-                        playbackComponents=[washout]
+                        timers=[routineTimer, globalClock], 
+                        currentRoutine=ITI,
                     )
                     # skip the frame we paused on
                     continue
@@ -2195,11 +1543,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             frameN = -1
             
             # --- Run Routine "driftCheck" ---
-            # if trial has changed, end Routine now
-            if isinstance(trials, data.TrialHandler2) and thisTrial.thisN != trials.thisTrial.thisN:
-                continueRoutine = False
             driftCheck.forceEnded = routineForceEnded = not continueRoutine
             while continueRoutine and routineTimer.getTime() < 0.001:
+                # if trial has changed, end Routine now
+                if hasattr(thisTrial, 'status') and thisTrial.status == STOPPING:
+                    continueRoutine = False
                 # get current time
                 t = routineTimer.getTime()
                 tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -2214,8 +1562,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                     pauseExperiment(
                         thisExp=thisExp, 
                         win=win, 
-                        timers=[routineTimer], 
-                        playbackComponents=[]
+                        timers=[routineTimer, globalClock], 
+                        currentRoutine=driftCheck,
                     )
                     # skip the frame we paused on
                     continue
@@ -2242,48 +1590,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             driftCheck.tStop = globalClock.getTime(format='float')
             driftCheck.tStopRefresh = tThisFlipGlobal
             thisExp.addData('driftCheck.stopped', driftCheck.tStop)
-            # This section of EyeLink DriftCheck component code configures some
-            # graphics options for drift check, and then performs the drift check
-            # Set background and foreground colors for the drift check target
-            # in PsychoPy, (-1, -1, -1)=black, (1, 1, 1)=white, (0, 0, 0)=mid-gray
-            background_color = win.color
-            foreground_color = (1,1,1)
-            genv.setCalibrationColors(foreground_color, background_color)
-            # Set up the drift check target
-            # The target could be a "circle" (default), a "picture", a "movie" clip,
-            # or a rotating "spiral". To configure the type of drift check target, set
-            # genv.setTargetType to "circle", "picture", "movie", or "spiral", e.g.,
-            genv.setTargetType('circle')
-            genv.setTargetSize(24)
-            # Beeps to play during calibration, validation and drift correction
-            # parameters: target, good, error
-            #     target -- sound to play when target moves
-            #     good -- sound to play on successful operation
-            #     error -- sound to play on failure or interruption
-            # Each parameter could be ''--default sound, 'off'--no sound, or a wav file
-            genv.setCalibrationSounds('off', 'off', 'off')
-            
-            # drift check
-            # the doDriftCorrect() function requires target position in integers
-            # the last two arguments:
-            # draw_target (1-default, 0-draw the target then call doDriftCorrect)
-            # allow_setup (1-press ESCAPE to recalibrate, 0-not allowed)
-            
-            # Skip drift-check if running the script in Dummy Mode
-            while not dummy_mode:
-                # terminate the task if no longer connected to the tracker or
-                # user pressed Ctrl-C to terminate the task
-                if (not el_tracker.isConnected()) or el_tracker.breakPressed():
-                    terminate_task(win,genv,edf_file,session_folder,session_identifier)
-                # drift-check and re-do camera setup if ESCAPE is pressed
-                dcX,dcY = eyelink_pos([0,0],[scn_width,scn_height],'pix')
-                try:
-                    error = el_tracker.doDriftCorrect(int(round(dcX)),int(round(dcY)),1,1)
-                    # break following a success drift-check
-                    if error is not pylink.ESC_KEY:
-                        break
-                except:
-                    pass
             # using non-slip timing so subtract the expected duration of this Routine (unless ended on request)
             if driftCheck.maxDurationReached:
                 routineTimer.addTime(-driftCheck.maxDuration)
@@ -2291,9 +1597,23 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 routineTimer.reset()
             else:
                 routineTimer.addTime(-0.001000)
+            # mark thisTrial as finished
+            if hasattr(thisTrial, 'status'):
+                thisTrial.status = FINISHED
+            # if awaiting a pause, pause now
+            if trials.status == PAUSED:
+                thisExp.status = PAUSED
+                pauseExperiment(
+                    thisExp=thisExp, 
+                    win=win, 
+                    timers=[globalClock], 
+                )
+                # once done pausing, restore running status
+                trials.status = STARTED
             thisExp.nextEntry()
             
         # completed 1.0 repeats of 'trials'
+        trials.status = FINISHED
         
         if thisSession is not None:
             # if running in a Session with a Liaison client, send data up to now
@@ -2333,11 +1653,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         frameN = -1
         
         # --- Run Routine "Break" ---
-        # if trial has changed, end Routine now
-        if isinstance(Blocks, data.TrialHandler2) and thisBlock.thisN != Blocks.thisTrial.thisN:
-            continueRoutine = False
         Break.forceEnded = routineForceEnded = not continueRoutine
         while continueRoutine:
+            # if trial has changed, end Routine now
+            if hasattr(thisBlock, 'status') and thisBlock.status == STOPPING:
+                continueRoutine = False
             # get current time
             t = routineTimer.getTime()
             tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -2400,8 +1720,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
                 pauseExperiment(
                     thisExp=thisExp, 
                     win=win, 
-                    timers=[routineTimer], 
-                    playbackComponents=[]
+                    timers=[routineTimer, globalClock], 
+                    currentRoutine=Break,
                 )
                 # skip the frame we paused on
                 continue
@@ -2437,14 +1757,22 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             Blocks.addData('break_key_resp.duration', break_key_resp.duration)
         # the Routine "Break" was not non-slip safe, so reset the non-slip timer
         routineTimer.reset()
+        # mark thisBlock as finished
+        if hasattr(thisBlock, 'status'):
+            thisBlock.status = FINISHED
+        # if awaiting a pause, pause now
+        if Blocks.status == PAUSED:
+            thisExp.status = PAUSED
+            pauseExperiment(
+                thisExp=thisExp, 
+                win=win, 
+                timers=[globalClock], 
+            )
+            # once done pausing, restore running status
+            Blocks.status = STARTED
     # completed nBlocks repeats of 'Blocks'
+    Blocks.status = FINISHED
     
-    # This section of the Initialize component calls the 
-    # terminate_task helper function to get the EDF file and close the connection
-    # to the Host PC
-    
-    # Disconnect, download the EDF file, then terminate the task
-    terminate_task(win,genv,edf_file,session_folder,session_identifier)
     
     # mark experiment as finished
     endExperiment(thisExp, win=win)
@@ -2490,6 +1818,9 @@ def endExperiment(thisExp, win=None):
     logging.console.setLevel(logging.WARNING)
     # mark experiment handler as finished
     thisExp.status = FINISHED
+    # run any 'at exit' functions
+    for fcn in runAtExit:
+        fcn()
     logging.flush()
 
 
